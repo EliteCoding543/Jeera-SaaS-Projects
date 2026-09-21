@@ -6,6 +6,7 @@ import cookieParse from 'cookie-parser'
 import UserRoutes from './Routes/User.routes.js'
 import OwnerRoutes from './Routes/Owner.routes.js'
 import AdminRoutes from './Routes/AdminOrg.routes.js'
+import AdminsRoutes from './Routes/Admin.routes.js'
 // import { addUser } from './Utlis/AddOwner.js'
 
 
@@ -17,6 +18,7 @@ app.use(express.json())
 app.use("/api/auth", UserRoutes)
 app.use("/api/owner", OwnerRoutes)
 app.use("/api/owner", AdminRoutes)
+app.use("/api/admin", AdminsRoutes)
 
 const PORT = process.env.PORT || 8080
 mongoose.connect(process.env.DB_TOKEN)
