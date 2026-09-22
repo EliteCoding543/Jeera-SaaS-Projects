@@ -19,7 +19,7 @@ export const isLoggedIn = async(req, res, next) => {
         const originalToken =  jwt.verify(token, process.env.JWT_TOKEN)
 
         // findUser now
-        const findUser = await User.findById(originalToken._id)
+        const findUser = await User.findById(originalToken._id).populate("organizationId")
 
         // Chcek user 
         if(!findUser){
