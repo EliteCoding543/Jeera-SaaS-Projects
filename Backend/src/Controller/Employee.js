@@ -1,5 +1,6 @@
 import ErrorHandler from "../Utlis/ErrorHandler.js";
 import ResponseHandler from "../Utlis/ResponseHandler.js";
+import {Team} from "../Models/Teams.Schema.js"
 import  User from "../Models/User.Schema.js";
 import validator from 'validator'
 import bcrypt from 'bcrypt'
@@ -61,30 +62,73 @@ export const createEmployee = async(req, res, next) => {
     }
 }
 
-export const getAllEmployee = async(req, res, next) => {
+export const getAllEmployee = async (req, res, next) => {
     try {
-        const { teamId } = req.params
-        if(!mongoose.Types.ObjectId.isValid(teamId)){
-            return next(new ErrorHandler(401, "Invalid ID"))
+        const { teamId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(teamId)) {
+            return next(
+                new ErrorHandler(400, "Invalid Team ID")
+            );
         }
 
         const allEmployees = await User.find({
-            teamId : teamId,
-            organizationId : req.user.organizationId._id
-        })
+            teamId,
+            organizationId: req.user.organizationId._id,
+            role: "employee",
+            isActive: true
+        });
 
-        res.status(200)
-        .json(
+        return res.status(200).json(
             new ResponseHandler(
                 200,
-                "All Employees",
-                allEmployees
+                "All Employees fetched successfully",
+                {
+                    employees: allEmployees,
+                    totalEmployees: allEmployees.length
+                }
             )
-        )
+        );
+
     } catch (error) {
-        next(error)
+        next(error);
     }
-}
+};
+
+export const getEmployeeById = async (req, res, next) => {
+    try {
+        const { employeeId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(employeeId)) {
+            return next(
+                new ErrorHandler(400, "Invalid Employee ID")
+            );
+        }
+
+        const employee = await User.findOne({
+            _id: employeeId,
+            organizationId: req.user.organizationId._id,
+            role: "employee"
+        });
+
+        if (!employee) {
+            return next(
+                new ErrorHandler(404, "Employee does not exist")
+            );
+        }
+
+        return res.status(200).json(
+            new ResponseHandler(
+                200,
+                "Employee fetched successfully",
+                employee
+            )
+        );
+
+    } catch (error) {
+        next(error);
+    }
+};
 
 export const deleteEmployee = async(req, res, next) => {
     try {

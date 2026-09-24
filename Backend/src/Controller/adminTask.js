@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 export const createTask = async(req, res, next) => {
    try {
     const{ employeeId } = req.params
+    // console.log(employeeId)
     if(!mongoose.Types.ObjectId.isValid(employeeId)){
         return next(new ErrorHandler(400, "inavlid Id"))
     }
@@ -72,7 +73,10 @@ export const getAllTask = async(req, res, next) => {
             new ResponseHandler(
                 200,
                 "Get All Task Successfuly",
+            { 
+                totalTask : allTask.length,
                 allTask
+            }
             )
         )
 
@@ -131,66 +135,99 @@ export const deleteTask = async(req, res, next) => {
     }
 }
 
-export const updatedTask = async(req, res, next) => {
+export const updatedTask = async (req, res, next) => {
     try {
-        const { taskId } = req.params
-        if(!mongoose.Types.ObjectId.isValid(taskId)){
-            return next(new ErrorHandler(400, "inavlid Id"))
+        const { taskId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(taskId)) {
+            return next(new ErrorHandler(400, "Invalid Task ID"));
         }
 
-        const{title, description, status, priority, teamId, assignedTo} = req.body
-
-        if(!title || !title.trim() || title.trim().length > 100){
-            return next(new ErrorHandler(400, `${title} is not a valid title`))
-        }
-
-        if(!description || !description.trim() || description.trim().length > 300){
-            return next(new ErrorHandler(400, `${description} is not a valid Description`))
-        }
-
-        if(!status || !status.trim() || !["todo", "in-progress", "completed"].includes(status.trim())){
-            return next(new ErrorHandler(400, `${status} is inavlid`))
-        }
-
-        if(!priority || !priority.trim() || !["low", "medium", "high"].includes(priority.trim())){
-            return next(new ErrorHandler(400, `${priority} select this coreect priority`))
-        }
-
-        if(!teamId || !mongoose.Types.ObjectId.isValid(teamId)){
-            return next(new ErrorHandler(400, "inavlid teamId"))
-        }
-
-        if(!assignedTo || !mongoose.Types.ObjectId.isValid(assignedTo)){
-            return next(new ErrorHandler(400, "inavlid employeeId"))
-        }
-
-        // Now updated task
-        const updatedTask = await Task.findByIdAndUpdate({
-            _id : taskId,
-            organizationId : req.user.organizationId._id
-        },
-        {
+        const {
             title,
             description,
             status,
             priority,
             teamId,
-            assignedTo,       
-        },
-        {
-            runValidators : true,
-            returnDocument : "after"
-        });
-        res.status(200)
-        .json(
+            assignedTo
+        } = req.body;
+
+        if (!title?.trim() || title.trim().length > 100) {
+            return next(
+                new ErrorHandler(400, "Invalid title")
+            );
+        }
+
+        if (!description?.trim() || description.trim().length > 300) {
+            return next(
+                new ErrorHandler(400, "Invalid description")
+            );
+        }
+
+        if (
+            !status?.trim() ||
+            !["todo", "in-progress", "completed"].includes(status.trim())
+        ) {
+            return next(
+                new ErrorHandler(400, "Invalid status")
+            );
+        }
+
+        if (
+            !priority?.trim() ||
+            !["low", "medium", "high"].includes(priority.trim())
+        ) {
+            return next(
+                new ErrorHandler(400, "Invalid priority")
+            );
+        }
+
+        if (!teamId || !mongoose.Types.ObjectId.isValid(teamId)) {
+            return next(
+                new ErrorHandler(400, "Invalid Team ID")
+            );
+        }
+
+        if (!assignedTo || !mongoose.Types.ObjectId.isValid(assignedTo)) {
+            return next(
+                new ErrorHandler(400, "Invalid Employee ID")
+            );
+        }
+
+        const updateTask = await Task.findOneAndUpdate(
+            {
+                _id: taskId,
+                organizationId: req.user.organizationId._id
+            },
+            {
+                title: title.trim(),
+                description: description.trim(),
+                status: status.trim(),
+                priority: priority.trim(),
+                teamId,
+                assignedTo
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if (!updateTask) {
+            return next(
+                new ErrorHandler(404, "Task not found")
+            );
+        }
+
+        return res.status(200).json(
             new ResponseHandler(
                 200,
-                "Updated task Successfuly",
-                updatedTask
+                "Task updated successfully",
+                updateTask
             )
-        )
+        );
 
     } catch (error) {
-        next(error)
+        next(error);
     }
-}
+};
