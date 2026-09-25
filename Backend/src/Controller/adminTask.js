@@ -148,7 +148,6 @@ export const updatedTask = async (req, res, next) => {
             description,
             status,
             priority,
-            teamId,
             assignedTo
         } = req.body;
 
@@ -194,6 +193,11 @@ export const updatedTask = async (req, res, next) => {
             );
         }
 
+        const foundEmployee = await User.findById(assignedTo)
+        if(!foundEmployee){
+            return next(new ErrorHandler(404, `${foundEmployee} is does not exists`))
+        }
+
         const updateTask = await Task.findOneAndUpdate(
             {
                 _id: taskId,
@@ -204,7 +208,7 @@ export const updatedTask = async (req, res, next) => {
                 description: description.trim(),
                 status: status.trim(),
                 priority: priority.trim(),
-                teamId,
+                teamId : foundEmployee.teamId,
                 assignedTo
             },
             {
