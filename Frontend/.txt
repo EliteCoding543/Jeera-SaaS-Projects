@@ -1,0 +1,29 @@
+src/
+│
+├── Pages/
+│   ├── Landing/
+│   │   ├── LandingPage.jsx
+│   │   │
+│   │   ├── components/
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── Hero.jsx
+│   │   │   ├── DashboardPreview.jsx
+│   │   │   ├── Features.jsx
+│   │   │   ├── FeatureCard.jsx
+│   │   │   ├── Workflow.jsx
+│   │   │   ├── WorkflowStep.jsx
+│   │   │   ├── AccessControl.jsx
+│   │   │   ├── RoleCard.jsx
+│   │   │   ├── CTA.jsx
+│   │   │   ├── Footer.jsx
+│   │   │   └── FooterColumn.jsx
+│   │   │
+│   │   └── data.js
+│   │
+│   ├── LoginPage.jsx
+│   └── SignupPage.jsx
+│
+├── redux/
+├── components/
+├── App.jsx
+└── main.jsx
