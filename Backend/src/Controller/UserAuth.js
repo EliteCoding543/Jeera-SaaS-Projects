@@ -16,7 +16,7 @@ export const LoginUser = async (req, res, next) => {
         }
 
         // Find user in DB
-        const foundUser = await User.findOne({ email });
+        const foundUser = await User.findOne({ email }).select("+password");
 
         // Check user exists
         if (!foundUser) {
@@ -45,6 +45,8 @@ export const LoginUser = async (req, res, next) => {
                 expiresIn: "1d"
             }
         );
+        // Password response se remove
+        foundUser.password = undefined;
 
         return res
             .status(200)

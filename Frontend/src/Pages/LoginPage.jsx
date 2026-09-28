@@ -17,6 +17,7 @@ import {
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+ 
   const nav = useNavigate()
   const[formData , setFormData] = useState({
     email : "",
@@ -42,9 +43,7 @@ const handleSubmit = async (e) => {
         withCredentials: true,
       }
     );
-
-    console.log(res.data);
-
+    toast.success("User logged in Successfull")
     nav("/dashboard");
   } catch (error) {
     console.log(error);
@@ -422,7 +421,7 @@ const handleSubmit = async (e) => {
               {/* Submit */}
               <button
                 type="submit"
-                className="group w-full h-12 rounded-xl bg-white text-black font-semibold flex items-center justify-center gap-2 hover:bg-gray-200 transition shadow-xl shadow-white/5"
+                className="group cursor-pointer w-full h-12 rounded-xl bg-white text-black font-semibold flex items-center justify-center gap-2 hover:bg-gray-200 transition shadow-xl shadow-white/5"
               >
                 Sign in
 

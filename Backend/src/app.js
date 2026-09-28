@@ -11,6 +11,8 @@ import AdminsRoutes from './Routes/Admin.routes.js'
 import employeeRoutes from './Routes/Employee.routes.js'
 import taskRoutes from './Routes/AdminTask.routes.js'
 import employeeTaskRoutes from './Routes/employeeTask.routes.js'
+import AnalyticsRouter from './Routes/analytics.routes.js'
+
 // import { addUser } from './Utlis/AddOwner.js'
 
 
@@ -31,6 +33,7 @@ app.use("/api/admin", AdminsRoutes)
 app.use("/api/admin", employeeRoutes)
 app.use("/api/admin", taskRoutes)
 app.use("/api/employee", employeeTaskRoutes)
+app.use("/api/analytics", AnalyticsRouter)
 
 const PORT = process.env.PORT || 8080
 mongoose.connect(process.env.DB_TOKEN)

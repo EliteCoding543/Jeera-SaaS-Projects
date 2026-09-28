@@ -6,7 +6,7 @@ import {addUserData} from '../utlis/Redux/userSlice'
 import Loading from '../components/Loading'
 
 const ProtectedRoutes = () => {
-   const userData = useSelector((state) => state.user)
+   const userData = useSelector(state => state.user)
    const dispatch = useDispatch()
    const nav = useNavigate()
 
@@ -14,9 +14,10 @@ const ProtectedRoutes = () => {
           axios.get(import.meta.env.VITE_BACKEND_URL + "/auth/profile", {withCredentials : true})
           .then((res) => {
             dispatch(addUserData(res.data.data))
+            // console.log(addUserData(res.data.data))
           })
           .catch(() => {
-            nav("login")
+            nav("/login")
           })
    }, [])
 

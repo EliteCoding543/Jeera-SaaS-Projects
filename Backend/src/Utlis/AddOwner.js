@@ -21,4 +21,4 @@ export const addUser = async (name, email, password, role) => {
     return user;
 };
 
-// addUser( "Shubham", "shubham@gmail.com", "Shubham90@", "Admin" );
+addUser( "Shubham kashyap", "shubham5432@gmail.com", "Shubham90@", "owner" );

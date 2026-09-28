@@ -1,10 +1,10 @@
 import { configureStore  } from '@reduxjs/toolkit'
-import { addUserData } from './userSlice'
+import {  userSlice } from './userSlice'
 
 
 const Store = configureStore({
     reducer : {
-        user : addUserData
+        user : userSlice.reducer
     }
 })
 

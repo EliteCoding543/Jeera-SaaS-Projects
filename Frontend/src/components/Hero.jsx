@@ -1,8 +1,10 @@
 import React from "react";
 import { ArrowRight, Play, CheckCircle2, Sparkles } from "lucide-react";
 import DashboardPreview from "./DashboardPreview";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const nav = useNavigate()
   return (
     <section className="relative overflow-hidden bg-white pt-32 pb-20 lg:pt-40 lg:pb-28">
       
@@ -61,7 +63,9 @@ const Hero = () => {
           {/* Buttons */}
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
 
-            <button className="group flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-6 py-3.5 text-sm font-semibold text-white shadow-xl shadow-slate-950/15 transition hover:-translate-y-0.5 hover:bg-slate-800 sm:w-auto">
+            <button 
+              onClick={() => nav("/login")}
+              className="group cursor-pointer flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-6 py-3.5 text-sm font-semibold text-white shadow-xl shadow-slate-950/15 transition hover:-translate-y-0.5 hover:bg-slate-800 sm:w-auto">
               Get started
 
               <ArrowRight
@@ -70,10 +74,12 @@ const Hero = () => {
               />
             </button>
 
-            <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 sm:w-auto">
+            <button 
+              onClick={() => nav("/dashboard")}
+              className="flex cursor-pointer w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 sm:w-auto">
               <Play size={15} fill="currentColor" />
 
-              See how it works
+              Go to Dashboard
             </button>
 
           </div>
