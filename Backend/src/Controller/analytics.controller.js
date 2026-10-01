@@ -112,9 +112,9 @@ export const getAllOrgsData = async(req, res) => {
         },
     },
 
-    {
-        $limit: 4,
-    },
+    // {
+    //     $limit: 4,
+    // },
     ]);
 
 

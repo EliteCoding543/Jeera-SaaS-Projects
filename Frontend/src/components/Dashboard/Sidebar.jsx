@@ -1,4 +1,3 @@
-import { NavLink, useNavigate } from "react-router-dom";
 import {
   ChevronRight,
   LogOut,
@@ -7,11 +6,11 @@ import {
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const Sidebar = ({ links }) => {
-  const nav = useNavigate();
+const Sidebar = ({ links, setActivePage, activePage }) => {
 
   return (
     <aside className="sticky top-18.25 hidden h-[calc(100vh-73px)] w-67.5 shrink-0 bg-[#f8fafc] lg:block">
+
       <div className="flex h-full flex-col px-4 py-5">
 
         {/* ─────────────────────────────────────
@@ -20,13 +19,9 @@ const Sidebar = ({ links }) => {
 
         <div className="relative mb-7 overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_4px_20px_rgba(15,23,42,0.04)]">
 
-          {/* subtle decoration */}
-
           <div className="absolute -right-8 -top-8 h-20 w-20 rounded-full bg-slate-100 blur-2xl" />
 
           <div className="relative flex items-center gap-3">
-
-            {/* Workspace icon */}
 
             <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-slate-950 shadow-lg shadow-slate-950/20">
 
@@ -35,8 +30,6 @@ const Sidebar = ({ links }) => {
               <div className="absolute h-1.5 w-1.5 rounded-full bg-slate-950" />
 
             </div>
-
-            {/* Workspace info */}
 
             <div className="min-w-0">
 
@@ -83,91 +76,85 @@ const Sidebar = ({ links }) => {
 
             const Icon = link.icon;
 
+            const isActive = activePage === link.key;
+
             return (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                className={({ isActive }) =>
-                  `group relative flex items-center gap-3 rounded-2xl p-2 transition-all duration-300 ${
-                    isActive
-                      ? "bg-slate-950 shadow-[0_8px_24px_rgba(15,23,42,0.16)]"
-                      : "hover:bg-white hover:shadow-[0_4px_16px_rgba(15,23,42,0.04)]"
-                  }`
-                }
+              <button
+                key={link.key}
+                onClick={() => setActivePage(link.key)}
+                className={`group relative flex w-full items-center gap-3 rounded-2xl p-2 text-left transition-all duration-300 ${
+                  isActive
+                    ? "bg-slate-950 shadow-[0_8px_24px_rgba(15,23,42,0.16)]"
+                    : "hover:bg-white hover:shadow-[0_4px_16px_rgba(15,23,42,0.04)]"
+                }`}
               >
 
-                {({ isActive }) => (
-                  <>
+                {/* Active glow */}
 
-                    {/* Active glow */}
-
-                    {isActive && (
-                      <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-white/6 to-transparent" />
-                    )}
-
-
-                    {/* Icon */}
-
-                    <div
-                      className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-300 ${
-                        isActive
-                          ? "bg-white/10 text-white ring-1 ring-white/10"
-                          : "bg-slate-100 text-slate-500 group-hover:bg-slate-950 group-hover:text-white"
-                      }`}
-                    >
-
-                      <Icon
-                        size={18}
-                        strokeWidth={1.8}
-                      />
-
-                    </div>
-
-
-                    {/* Text */}
-
-                    <div className="relative min-w-0 flex-1">
-
-                      <p
-                        className={`text-sm font-semibold transition-colors ${
-                          isActive
-                            ? "text-white"
-                            : "text-slate-600 group-hover:text-slate-950"
-                        }`}
-                      >
-                        {link.label}
-                      </p>
-
-                      {isActive && (
-                        <p className="mt-0.5 text-[10px] font-medium text-slate-400">
-                          Currently active
-                        </p>
-                      )}
-
-                    </div>
-
-
-                    {/* Arrow */}
-
-                    <div
-                      className={`relative flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-300 ${
-                        isActive
-                          ? "bg-white/10 text-white"
-                          : "text-slate-300 opacity-0 group-hover:translate-x-0.5 group-hover:opacity-100"
-                      }`}
-                    >
-
-                      <ChevronRight
-                        size={15}
-                        strokeWidth={2}
-                      />
-
-                    </div>
-
-                  </>
+                {isActive && (
+                  <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-white/6 to-transparent" />
                 )}
 
-              </NavLink>
+
+                {/* Icon */}
+
+                <div
+                  className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-300 ${
+                    isActive
+                      ? "bg-white/10 text-white ring-1 ring-white/10"
+                      : "bg-slate-100 text-slate-500 group-hover:bg-slate-950 group-hover:text-white"
+                  }`}
+                >
+
+                  <Icon
+                    size={18}
+                    strokeWidth={1.8}
+                  />
+
+                </div>
+
+
+                {/* Text */}
+
+                <div className="relative min-w-0 flex-1">
+
+                  <p
+                    className={`text-sm font-semibold transition-colors ${
+                      isActive
+                        ? "text-white"
+                        : "text-slate-600 group-hover:text-slate-950"
+                    }`}
+                  >
+                    {link.label}
+                  </p>
+
+                  {isActive && (
+                    <p className="mt-0.5 text-[10px] font-medium text-slate-400">
+                      Currently active
+                    </p>
+                  )}
+
+                </div>
+
+
+                {/* Arrow */}
+
+                <div
+                  className={`relative flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-300 ${
+                    isActive
+                      ? "bg-white/10 text-white"
+                      : "text-slate-300 opacity-0 group-hover:translate-x-0.5 group-hover:opacity-100"
+                  }`}
+                >
+
+                  <ChevronRight
+                    size={15}
+                    strokeWidth={2}
+                  />
+
+                </div>
+
+              </button>
             );
           })}
 
@@ -180,11 +167,9 @@ const Sidebar = ({ links }) => {
 
         <div className="mt-auto">
 
-          {/* Upgrade / workspace card */}
+          {/* Workspace Card */}
 
           <div className="relative mb-4 overflow-hidden rounded-2xl bg-slate-950 p-4 text-white shadow-lg shadow-slate-950/10">
-
-            {/* glow */}
 
             <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
 
@@ -221,24 +206,36 @@ const Sidebar = ({ links }) => {
 
           <button
             onClick={() => {
+
               axios
                 .post(
-                  import.meta.env.VITE_BACKEND_URL +
-                    "/auth/logout",
+                  import.meta.env.VITE_BACKEND_URL + "/auth/logout",
                   {},
                   {
                     withCredentials: true,
                   }
                 )
                 .then(() => {
+
                   toast.success("User logged out");
-                  nav("/login");
+
+                  window.location.href = "/login";
+
+                })
+                .catch((error) => {
+
+                  toast.error(
+                    error.response?.data?.message ||
+                    "Logout failed"
+                  );
+
                 });
+
             }}
-            className="group cursor-pointer flex w-full items-center gap-3 rounded-2xl p-2 transition-all duration-300 hover:bg-red-50"
+            className="group flex w-full cursor-pointer items-center gap-3 rounded-2xl p-2 transition-all duration-300 hover:bg-red-50"
           >
 
-            {/* icon */}
+            {/* Icon */}
 
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition-all duration-300 group-hover:bg-red-100 group-hover:text-red-600">
 
@@ -250,7 +247,7 @@ const Sidebar = ({ links }) => {
             </div>
 
 
-            {/* text */}
+            {/* Text */}
 
             <div className="flex-1 text-left">
 
@@ -275,6 +272,7 @@ const Sidebar = ({ links }) => {
         </div>
 
       </div>
+
     </aside>
   );
 };

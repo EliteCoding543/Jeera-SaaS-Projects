@@ -11,7 +11,7 @@ export const adminOrgCreate = async(req, res, next) => {
    try {
     const { id } = req.params
     if(!id || !mongoose.Types.ObjectId.isValid(id)){
-        next(new ErrorHandler(401, "invalid id"))
+        return next(new ErrorHandler(401, "invalid id"))
     }
     const { email , name , password } = req.body
     // Chcek email is valid or not

@@ -39,12 +39,13 @@ export const CreateTeamByAdmins = async (req, res, next) => {
 export const getAllTeams = async (req, res, next) => {
     try {
         const organizationId = req.user.organizationId._id;
+        // console.log("ORG ID:", req.user.organizationId._id);
 
         const foundTeams = await Team.find({
             organizationId,
             isActive: true,
         });
-
+        // console.log("FOUND TEAMS:", foundTeams);
         return res.status(200).json(
             new ResponseHandler(
                 200,
@@ -55,6 +56,7 @@ export const getAllTeams = async (req, res, next) => {
                 }
             )
         );
+        
 
     } catch (error) {
         next(error);

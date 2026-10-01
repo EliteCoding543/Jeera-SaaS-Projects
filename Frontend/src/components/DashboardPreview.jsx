@@ -1,6 +1,8 @@
 import React from "react";
+import GreetingDashboard from "../comonComp/GreetingDashboard";
 
 const DashboardPreview = () => {
+
   return (
     <div className="relative mx-auto mt-20 max-w-6xl">
       {/* Glow */}
@@ -66,12 +68,11 @@ const DashboardPreview = () => {
             <div className="flex items-center justify-between">
 
               <div>
-                <p className="text-xs font-medium text-slate-400">
-                  Monday, September 22
-                </p>
+                <div className="text-xs font-medium text-slate-400">
+                  <GreetingDashboard />
+                </div>
 
                 <h3 className="mt-1 text-xl font-bold text-slate-950">
-                  Good morning, Shubham
                 </h3>
               </div>
 

@@ -28,3 +28,50 @@ src/
 ├── App.jsx
 └── main.jsx
 
+{
+    "totalTask": 3,
+    "allTask": [
+        {
+            "_id": "6ab54fccdad1ed66939578e7",
+            "title": "Complete Employee Dashboard",
+            "description": "Create the employee dashboard with profile, tasks and activity details",
+            "status": "in-progress",
+            "priority": "high",
+            "organizationId": "6aad27cd74a6922dd6819261",
+            "teamId": "6ab241b0f79e262a5ed4e49d",
+            "assignedTo": "6ab4f01a40d0d74453cb2d12",
+            "createdBy": "6aae7968d84bff124ebba97f",
+            "createdAt": "2026-09-24T16:29:00.101Z",
+            "updatedAt": "2026-09-25T08:41:52.901Z",
+            "__v": 0
+        },
+        {
+            "_id": "6ab54fefdad1ed66939578e8",
+            "title": "Fix Login Authentication Bug",
+            "description": "Investigate and fix the authentication issue in the employee login module",
+            "status": "in-progress",
+            "priority": "high",
+            "organizationId": "6aad27cd74a6922dd6819261",
+            "teamId": "6ab241b0f79e262a5ed4e49d",
+            "assignedTo": "6ab4f01a40d0d74453cb2d12",
+            "createdBy": "6aae7968d84bff124ebba97f",
+            "createdAt": "2026-09-24T16:29:35.986Z",
+            "updatedAt": "2026-09-24T16:29:35.986Z",
+            "__v": 0
+        },
+        {
+            "_id": "6ab54ffddad1ed66939578e9",
+            "title": "Design Team Profile Page",
+            "description": "Create a responsive profile page showing employee information and team details",
+            "status": "todo",
+            "priority": "medium",
+            "organizationId": "6aad27cd74a6922dd6819261",
+            "teamId": "6ab241b0f79e262a5ed4e49d",
+            "assignedTo": "6ab4f01a40d0d74453cb2d12",
+            "createdBy": "6aae7968d84bff124ebba97f",
+            "createdAt": "2026-09-24T16:29:49.725Z",
+            "updatedAt": "2026-09-24T16:29:49.725Z",
+            "__v": 0
+        }
+    ]
+}
