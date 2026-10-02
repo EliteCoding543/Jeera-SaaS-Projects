@@ -139,6 +139,7 @@ const OwnerDashboard = () => {
           <OrgDashboard 
             analytics={analytics}
             allOrgs={allOrgs}
+            setAllOrgs={setAllOrgs}
             activeOrganizations={activeOrganizations}
             inactiveOrganizations={inactiveOrganizations}
             totalOrganizations={totalOrganizations}
@@ -157,6 +158,7 @@ const OwnerDashboard = () => {
           analytics={analytics} 
           setAnalytics={setAnalytics}
           allOrgs={allOrgs} 
+          setAllOrgs={setAllOrgs}
           adminisModal={adminisModal} 
           setAdminsModal={setAdminsModal}
           />

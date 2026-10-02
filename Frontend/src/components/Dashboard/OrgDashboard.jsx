@@ -15,16 +15,21 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import ModalOrg from "../../comonComp/ModalOrg";
+import { activeOrgs, deactivateOrg } from "../../API's/organizationAPI";
+import toast from "react-hot-toast";
+import ViewOrgModal from "./ViewOrgModal";
 
 const OrgDashboard = ({
   allOrgs = [],
   setIsModalOpen,
+  setAllOrgs,
   isModalOpen
 }) => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [openMenu, setOpenMenu] = useState(null);
-
+  const [viewOrg, setViewOrg] = useState(null)
+// console.log(allOrgs)
   const filteredOrganizations = useMemo(() => {
     return allOrgs.filter((org) => {
       const matchesSearch = org.name
@@ -45,18 +50,25 @@ const OrgDashboard = ({
   const handleEdit = (org) => {
     console.log("Edit organization:", org);
   };
-
-  const handleStatusChange = (org) => {
-    console.log(
-      org.isActive
-        ? "Deactivate organization:"
-        : "Activate organization:",
-      org
+  // Active and Deactive Orga
+  const handleStatusChange = async(org) => {
+    console.log("All obj", org.name)
+    if(org.isActive){
+       await deactivateOrg(org._id)
+    }
+    else {
+       await activeOrgs(org._id, org.name)
+    }
+    setAllOrgs((prev) => 
+      prev.map((item) => 
+        item._id === org._id ? {...item, isActive : !item.isActive} : item
+      )
     );
-  };
-
-  const handleView = (org) => {
-    console.log("View organization:", org);
+    toast.success(
+      org.isActive
+        ? ` ${org.name} deactivated successfully`
+        : `${org.name} activated successfully`
+    );
   };
 
   return (
@@ -112,8 +124,9 @@ const OrgDashboard = ({
         </div>
 
       </section>
+      
       {isModalOpen && (
-        <ModalOrg setIsModalOpen={setIsModalOpen} />
+        <ModalOrg setIsModalOpen={setIsModalOpen} setAllOrgs={setAllOrgs}/>
       )}
 
       {/* =====================================================
@@ -251,7 +264,7 @@ const OrgDashboard = ({
 
                 {/* Desktop */}
 
-                <div className="hidden grid-cols-[minmax(260px,1.7fr)_0.8fr_1fr_0.8fr_70px] items-center gap-4 md:grid">
+                <div className="hidden relative grid-cols-[minmax(260px,1.7fr)_0.8fr_1fr_0.8fr_70px] items-center gap-4 md:grid">
 
                   {/* Organization */}
 
@@ -374,13 +387,14 @@ const OrgDashboard = ({
 
 
                     {openMenu === org._id && (
-
-                      <div className="absolute right-0 top-10 z-30 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-[0_15px_40px_rgba(15,23,42,0.15)]">
-
+                      <div
+                        className="absolute right-0 bottom-11 z-50 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-[0_15px_40px_rgba(15,23,42,0.15)]"
+                      >
+                        {/* View */}
                         <button
                           type="button"
                           onClick={() => {
-                            handleView(org);
+                            setViewOrg(org);
                             setOpenMenu(null);
                           }}
                           className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
@@ -389,20 +403,9 @@ const OrgDashboard = ({
                           View Organization
                         </button>
 
-                        <button
-                          type="button"
-                          onClick={() => {
-                            handleEdit(org);
-                            setOpenMenu(null);
-                          }}
-                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-semibold text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-600"
-                        >
-                          <Pencil size={14} />
-                          Edit Organization
-                        </button>
-
                         <div className="my-1 border-t border-slate-100" />
 
+                        {/* Status */}
                         <button
                           type="button"
                           onClick={() => {
@@ -421,9 +424,7 @@ const OrgDashboard = ({
                             ? "Deactivate Organization"
                             : "Activate Organization"}
                         </button>
-
                       </div>
-
                     )}
 
                   </div>
@@ -609,6 +610,14 @@ const OrgDashboard = ({
 
       </section>
 
+  {/* /* =====================================================
+         VIEW ADMINI MODAL
+  ====================================================== */}
+    {
+      viewOrg && (
+        <ViewOrgModal  viewOrg={viewOrg} setViewOrg={setViewOrg} />
+      )
+    }
     </main>
   );
 };

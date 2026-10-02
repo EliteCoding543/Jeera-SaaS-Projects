@@ -17,6 +17,7 @@ import {
 import Modaladministrator from "../../comonComp/Modaladministrator";
 import { activedAdmins, deactivateAdmin } from "../../API's/createAdmin";
 import toast from "react-hot-toast";
+import ViewAdminModal from "../../comonComp/ViewAdminModal";
 
 const Administrator = ({
   analytics,
@@ -28,6 +29,8 @@ const Administrator = ({
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [openMenu, setOpenMenu] = useState(null);
+  const [editAdmin, setEditAdmin] = useState(null)
+  const [viewAdmin, setViewAdmin] = useState(null);
 
   // Total administrators
   const totalAdmins = analytics?.totalAdmins || 0;
@@ -61,13 +64,16 @@ const Administrator = ({
 
   // Edit administrator
   const handleEdit = (admin) => {
-    console.log("Edit administrator:", admin);
+    // console.log("Edit administrator:", admin);
+    setEditAdmin(admin)
+    setAdminsModal(true)
     setOpenMenu(null);
   };
 
   // View administrator
   const handleView = (admin) => {
-    console.log("View administrator:", admin);
+    // console.log("View administrator:", admin);
+    setViewAdmin(admin)
     setOpenMenu(null);
   };
 
@@ -88,6 +94,11 @@ const Administrator = ({
           : item
         )
       }))
+      toast.success(
+      admin.isActive
+        ? ` ${admin.name} deactivated successfully`
+        : `${admin.name} activated successfully `
+      );
       setOpenMenu(null)
     } catch (error) {
       toast.error(`DeActive admin error`, error)
@@ -674,7 +685,10 @@ const Administrator = ({
 
           <button
             type="button"
-            onClick={() => setAdminsModal(true)}
+            onClick={() => {
+              setAdminsModal(true),
+              setEditAdmin(null)
+            }}
             className="group mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-slate-100"
           >
             <UserPlus size={16} />
@@ -746,8 +760,21 @@ const Administrator = ({
         <Modaladministrator
           setAdminsModal={setAdminsModal}
           allOrgs={allOrgs}
+          editAdmin={editAdmin}
         />
       )}
+
+     {/* =====================================================
+         VIEW ADMINI MODAL
+      ====================================================== */}
+      {
+        viewAdmin && (
+          <ViewAdminModal 
+          admin={viewAdmin}
+          setViewAdmin={setViewAdmin}
+          />
+        )
+      }
     </main>
   );
 };

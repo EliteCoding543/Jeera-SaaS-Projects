@@ -160,8 +160,10 @@ export const updateOrg = async(req, res, next) => {
         const data = await Organization.findByIdAndUpdate(
             id, 
             { name, isActive }, 
-            {runValidators : true},
-            {returnDocument : "after"}
+            {
+                runValidators : true,
+                returnDocument : "after"
+            }
         );
 
         // Check if organization exists
