@@ -52,7 +52,7 @@ const OrgDashboard = ({
   };
   // Active and Deactive Orga
   const handleStatusChange = async(org) => {
-    console.log("All obj", org.name)
+    // console.log("All obj", org.name)
     if(org.isActive){
        await deactivateOrg(org._id)
     }
