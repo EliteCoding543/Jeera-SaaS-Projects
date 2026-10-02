@@ -65,7 +65,7 @@ export const adminOrgCreate = async(req, res, next) => {
         name, 
         password : hasedPasswordOrg,
         email,
-        role : "Admin",
+        role : "admin",
         organizationId : id,
         isActive : foundOrg.isActive  // if org is active then admin active otherwise not
     })
@@ -99,7 +99,7 @@ export const getAllAdmin = async(req, res, next) => {
         // Found Admin in org 
         const findAdminOrg = await User.find({
           organizationId : foundOrg._id,
-          role : "Admin"
+          role : "admin"
         })
 
         res.status(200)

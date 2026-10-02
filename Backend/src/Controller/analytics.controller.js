@@ -9,7 +9,14 @@ export const getAnalytics = async(req, res) => {
         role : "admin"
     })
 
-
+    const allAdmins = await User.find({
+      role: "admin",
+    })
+      .populate("organizationId", "name isActive")
+      .select("-password")
+      .sort({ 
+         createdAt: -1 
+      });
 
     const demo = await Organization.aggregate([
         
@@ -43,7 +50,8 @@ export const getAnalytics = async(req, res) => {
     .json({
        data : {
         ...demo[0],
-        totalAdmins
+        totalAdmins,
+        allAdmins
        }
     })
 }

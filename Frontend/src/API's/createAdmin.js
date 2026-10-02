@@ -8,3 +8,19 @@ export const createAdministrator = (organizationId, adminData) => {
         }
     )
 }
+export const activedAdmins = (id) => {
+    return axios.patch(`${api}/owner/admins/${id}`,
+        {},
+        {
+            withCredentials : true
+        },
+    )
+}
+
+export const deactivateAdmin = (id) => {
+    return axios.delete(`${api}/owner/admins/${id}`, 
+        {
+            withCredentials : true
+        }
+    )
+}

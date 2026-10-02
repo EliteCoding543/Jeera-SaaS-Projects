@@ -15,50 +15,83 @@ import {
   Power,
 } from "lucide-react";
 import Modaladministrator from "../../comonComp/Modaladministrator";
+import { activedAdmins, deactivateAdmin } from "../../API's/createAdmin";
+import toast from "react-hot-toast";
 
 const Administrator = ({
   analytics,
   allOrgs = [],
   setAdminsModal,
   adminisModal,
+  setAnalytics
 }) => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [openMenu, setOpenMenu] = useState(null);
 
+  // Total administrators
   const totalAdmins = analytics?.totalAdmins || 0;
 
-  const filteredOrganizations = useMemo(() => {
-    return allOrgs.filter((org) => {
-      const matchesSearch = org.name
-        ?.toLowerCase()
-        .includes(search.toLowerCase());
+  // Actual administrators
+  const allAdmins = analytics?.allAdmins || [];
+
+  // Search + status filter
+  const filteredAdmins = useMemo(() => {
+    const searchValue = search.toLowerCase().trim();
+
+    return allAdmins.filter((admin) => {
+      const adminName = admin.name?.toLowerCase() || "";
+      const adminEmail = admin.email?.toLowerCase() || "";
+      const organizationName =
+        admin.organizationId?.name?.toLowerCase() || "";
+
+      const matchesSearch =
+        adminName.includes(searchValue) ||
+        adminEmail.includes(searchValue) ||
+        organizationName.includes(searchValue);
 
       const matchesStatus =
         statusFilter === "all" ||
-        (statusFilter === "active" && org.isActive) ||
-        (statusFilter === "inactive" && !org.isActive);
+        (statusFilter === "active" && admin.isActive) ||
+        (statusFilter === "inactive" && !admin.isActive);
 
       return matchesSearch && matchesStatus;
     });
-  }, [allOrgs, search, statusFilter]);
+  }, [allAdmins, search, statusFilter]);
 
-  const handleEdit = (org) => {
-    console.log("Edit administrator for:", org);
+  // Edit administrator
+  const handleEdit = (admin) => {
+    console.log("Edit administrator:", admin);
     setOpenMenu(null);
   };
 
-  const handleView = (org) => {
-    console.log("View administrators for:", org);
+  // View administrator
+  const handleView = (admin) => {
+    console.log("View administrator:", admin);
     setOpenMenu(null);
   };
 
-  const handleToggleStatus = (org) => {
-    console.log(
-      `${org.isActive ? "Deactivate" : "Activate"} organization:`,
-      org
-    );
-    setOpenMenu(null);
+  // Activate / Deactivate administrator
+  const handleToggleStatus = async(admin) => {
+    try {
+      if(admin.isActive){
+        await deactivateAdmin(admin._id)
+      }
+      else {
+        activedAdmins(admin._id)
+      }
+      // State update 
+      setAnalytics((prev) => ({
+        ...prev,
+        allAdmins : prev.allAdmins.map((item) => 
+          item._id === admin._id ? {...item, isActive : !item.isActive,} 
+          : item
+        )
+      }))
+      setOpenMenu(null)
+    } catch (error) {
+      toast.error(`DeActive admin error`, error)
+    }
   };
 
   return (
@@ -68,13 +101,9 @@ const Administrator = ({
       ====================================================== */}
 
       <section className="relative mb-7 overflow-hidden rounded-[30px] bg-slate-950 px-6 py-7 text-white shadow-[0_24px_60px_rgba(15,23,42,0.14)] sm:px-8 lg:py-8">
-        {/* Background glow */}
-
         <div className="absolute -right-24 -top-28 h-80 w-80 rounded-full bg-indigo-500/20 blur-3xl" />
 
         <div className="absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
-
-        {/* Grid */}
 
         <div
           className="absolute inset-0 opacity-[0.035]"
@@ -106,8 +135,7 @@ const Administrator = ({
             </h1>
 
             <p className="mt-3 max-w-xl text-sm leading-6 text-slate-400">
-              Create and manage administrators responsible for your
-              organizations.
+              Manage administrators and view the organization they belong to.
             </p>
           </div>
 
@@ -146,7 +174,7 @@ const Administrator = ({
 
           <input
             type="text"
-            placeholder="Search organization..."
+            placeholder="Search administrator, email or organization..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="h-12 w-full rounded-xl border border-slate-200 bg-white pl-11 pr-4 text-sm font-medium text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50"
@@ -162,7 +190,7 @@ const Administrator = ({
               onChange={(e) => setStatusFilter(e.target.value)}
               className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-white px-4 pr-10 text-sm font-semibold text-slate-600 outline-none transition focus:border-indigo-400 sm:w-40"
             >
-              <option value="all">All Organizations</option>
+              <option value="all">All Admins</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
@@ -197,16 +225,16 @@ const Administrator = ({
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-base font-bold text-slate-950">
-                Organization Administrators
+                Administrator Directory
               </h2>
 
               <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-500">
-                {filteredOrganizations.length} Organizations
+                {filteredAdmins.length} Administrators
               </span>
             </div>
 
             <p className="mt-1 text-xs text-slate-400">
-              Manage administrators assigned to each organization.
+              View administrator details and their assigned organization.
             </p>
           </div>
 
@@ -225,15 +253,23 @@ const Administrator = ({
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50/60">
                 <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Administrator
+                </th>
+
+                <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Email
+                </th>
+
+                <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
                   Organization
                 </th>
 
                 <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Administrators
+                  Organization Status
                 </th>
 
                 <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Organization status
+                  Admin Status
                 </th>
 
                 <th className="px-6 py-4 text-right text-[10px] font-bold uppercase tracking-wider text-slate-400">
@@ -243,71 +279,98 @@ const Administrator = ({
             </thead>
 
             <tbody className="divide-y divide-slate-100">
-              {filteredOrganizations.map((org) => (
+              {filteredAdmins.map((admin) => (
                 <tr
-                  key={org._id}
+                  key={admin._id}
                   className="group transition hover:bg-slate-50/60"
                 >
-                  {/* Organization */}
+                  {/* Administrator */}
 
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs font-black text-slate-700">
-                        {org.name?.slice(0, 2).toUpperCase()}
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-xs font-black text-indigo-600">
+                        {admin.name?.slice(0, 2).toUpperCase() || "AD"}
                       </div>
 
                       <div className="min-w-0">
                         <p className="truncate text-sm font-bold text-slate-950">
-                          {org.name}
+                          {admin.name || "Unknown Administrator"}
                         </p>
 
-                        <p className="mt-1 flex items-center gap-1 text-xs text-slate-400">
-                          <Building2 size={12} />
-                          Organization
+                        <p className="mt-1 text-xs text-slate-400">
+                          Administrator
                         </p>
                       </div>
                     </div>
                   </td>
 
-                  {/* Admin count */}
+                  {/* Email */}
+
+                  <td className="px-6 py-5">
+                    <p className="text-sm font-medium text-slate-600">
+                      {admin.email || "No email"}
+                    </p>
+                  </td>
+
+                  {/* Organization */}
 
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
-                        <UsersRound size={16} />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                        <Building2 size={16} />
                       </div>
 
-                      <div>
-                        <p className="text-sm font-bold text-slate-950">
-                          {org.adminCount || 0}
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold text-slate-950">
+                          {admin.organizationId?.name || "No organization"}
                         </p>
 
                         <p className="text-[11px] text-slate-400">
-                          {(org.adminCount || 0) === 1
-                            ? "Administrator"
-                            : "Administrators"}
+                          Assigned organization
                         </p>
                       </div>
                     </div>
                   </td>
 
-                  {/* Organization status */}
+                  {/* Organization Status */}
 
                   <td className="px-6 py-5">
                     <span
                       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide ${
-                        org.isActive
+                        admin.organizationId?.isActive
                           ? "bg-emerald-50 text-emerald-700"
                           : "bg-amber-50 text-amber-700"
                       }`}
                     >
-                      {org.isActive ? (
+                      {admin.organizationId?.isActive ? (
                         <UserCheck size={12} />
                       ) : (
                         <UserX size={12} />
                       )}
 
-                      {org.isActive ? "Active" : "Inactive"}
+                      {admin.organizationId?.isActive
+                        ? "Active"
+                        : "Inactive"}
+                    </span>
+                  </td>
+
+                  {/* Admin Status */}
+
+                  <td className="px-6 py-5">
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide ${
+                        admin.isActive
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-amber-50 text-amber-700"
+                      }`}
+                    >
+                      {admin.isActive ? (
+                        <UserCheck size={12} />
+                      ) : (
+                        <UserX size={12} />
+                      )}
+
+                      {admin.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
 
@@ -320,7 +383,7 @@ const Administrator = ({
                       <button
                         type="button"
                         title="Manage administrator"
-                        onClick={() => handleEdit(org)}
+                        onClick={() => handleEdit(admin)}
                         className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 transition hover:bg-indigo-50 hover:text-indigo-600"
                       >
                         <Pencil size={15} />
@@ -330,8 +393,8 @@ const Administrator = ({
 
                       <button
                         type="button"
-                        title="View administrators"
-                        onClick={() => handleView(org)}
+                        title="View administrator"
+                        onClick={() => handleView(admin)}
                         className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 transition hover:bg-slate-100 hover:text-slate-700"
                       >
                         <ArrowUpRight size={16} />
@@ -344,7 +407,7 @@ const Administrator = ({
                         title="More actions"
                         onClick={() =>
                           setOpenMenu(
-                            openMenu === org._id ? null : org._id
+                            openMenu === admin._id ? null : admin._id
                           )
                         }
                         className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 transition hover:bg-slate-100 hover:text-slate-700"
@@ -354,20 +417,20 @@ const Administrator = ({
 
                       {/* Dropdown */}
 
-                      {openMenu === org._id && (
+                      {openMenu === admin._id && (
                         <div className="absolute right-0 top-11 z-20 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl">
                           <button
                             type="button"
-                            onClick={() => handleView(org)}
+                            onClick={() => handleView(admin)}
                             className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50"
                           >
                             <Eye size={15} />
-                            View administrators
+                            View administrator
                           </button>
 
                           <button
                             type="button"
-                            onClick={() => handleEdit(org)}
+                            onClick={() => handleEdit(admin)}
                             className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50"
                           >
                             <Pencil size={15} />
@@ -376,11 +439,14 @@ const Administrator = ({
 
                           <button
                             type="button"
-                            onClick={() => handleToggleStatus(org)}
+                            onClick={() => handleToggleStatus(admin)}
                             className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50"
                           >
                             <Power size={15} />
-                            {org.isActive ? "Deactivate" : "Activate"}
+
+                            {admin.isActive
+                              ? "Deactivate"
+                              : "Activate"}
                           </button>
                         </div>
                       )}
@@ -397,145 +463,184 @@ const Administrator = ({
         ====================================================== */}
 
         <div className="divide-y divide-slate-100 md:hidden">
-          {filteredOrganizations.map((org) => (
-            <div key={org._id} className="p-5">
+          {filteredAdmins.map((admin) => (
+            <div key={admin._id} className="p-5">
+              {/* Admin */}
+
               <div className="flex items-start justify-between gap-4">
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs font-black text-slate-700">
-                    {org.name?.slice(0, 2).toUpperCase()}
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-xs font-black text-indigo-600">
+                    {admin.name?.slice(0, 2).toUpperCase() || "AD"}
                   </div>
 
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold text-slate-950">
-                      {org.name}
+                      {admin.name || "Unknown Administrator"}
                     </p>
 
-                    <p className="mt-1 text-xs text-slate-400">
-                      Organization
+                    <p className="mt-1 truncate text-xs text-slate-400">
+                      {admin.email || "No email"}
                     </p>
                   </div>
                 </div>
 
                 <span
                   className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold ${
-                    org.isActive
+                    admin.isActive
                       ? "bg-emerald-50 text-emerald-700"
                       : "bg-amber-50 text-amber-700"
                   }`}
                 >
-                  {org.isActive ? "Active" : "Inactive"}
+                  {admin.isActive ? "Active" : "Inactive"}
                 </span>
               </div>
 
-              <div className="mt-5 flex items-center justify-between">
-                {/* Admin count */}
+              {/* Organization */}
 
-                <div className="flex items-center gap-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
-                    <UsersRound size={16} />
+              <div className="mt-5 rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm">
+                    <Building2 size={17} />
                   </div>
+
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold text-slate-950">
+                      {admin.organizationId?.name || "No organization"}
+                    </p>
+
+                    <p className="mt-1 text-[10px] uppercase tracking-wider text-slate-400">
+                      Assigned organization
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between border-t border-slate-200/70 pt-4">
+                  {/* Organization status */}
 
                   <div>
-                    <p className="text-sm font-bold text-slate-950">
-                      {org.adminCount || 0}
+                    <p className="text-[10px] uppercase tracking-wider text-slate-400">
+                      Organization status
                     </p>
 
-                    <p className="text-[10px] text-slate-400">
-                      {(org.adminCount || 0) === 1
-                        ? "Administrator"
-                        : "Administrators"}
+                    <span
+                      className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold ${
+                        admin.organizationId?.isActive
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-amber-50 text-amber-700"
+                      }`}
+                    >
+                      {admin.organizationId?.isActive
+                        ? "Active"
+                        : "Inactive"}
+                    </span>
+                  </div>
+
+                  {/* Admin status */}
+
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-slate-400">
+                      Admin status
                     </p>
+
+                    <span
+                      className={`mt-1 inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold ${
+                        admin.isActive
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-amber-50 text-amber-700"
+                      }`}
+                    >
+                      {admin.isActive ? "Active" : "Inactive"}
+                    </span>
                   </div>
                 </div>
+              </div>
 
-                {/* Actions */}
+              {/* Actions */}
 
-                <div className="relative flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => handleEdit(org)}
-                    title="Manage administrator"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 hover:bg-indigo-50 hover:text-indigo-600"
-                  >
-                    <Pencil size={15} />
-                  </button>
+              <div className="relative mt-4 flex justify-end gap-1">
+                <button
+                  type="button"
+                  onClick={() => handleEdit(admin)}
+                  title="Manage administrator"
+                  className="flex cursor-pointer h-9 w-9 items-center justify-center rounded-lg text-slate-300 transition hover:bg-indigo-50 hover:text-indigo-600"
+                >
+                  <Pencil size={15} />
+                </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleView(org)}
-                    title="View administrators"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 hover:bg-slate-100 hover:text-slate-700"
-                  >
-                    <ArrowUpRight size={16} />
-                  </button>
+                <button
+                  type="button"
+                  onClick={() => handleView(admin)}
+                  title="View administrator"
+                  className="flex cursor-pointer h-9 w-9 items-center justify-center rounded-lg text-slate-300 transition hover:bg-slate-100 hover:text-slate-700"
+                >
+                  <ArrowUpRight size={16} />
+                </button>
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setOpenMenu(
-                        openMenu === org._id ? null : org._id
-                      )
-                    }
-                    title="More actions"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 hover:bg-slate-100 hover:text-slate-700"
-                  >
-                    <MoreHorizontal size={17} />
-                  </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setOpenMenu(
+                      openMenu === admin._id ? null : admin._id
+                    )
+                  }
+                  title="More actions"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 transition hover:bg-slate-100 hover:text-slate-700"
+                >
+                  <MoreHorizontal size={17} />
+                </button>
 
-                  {/* Mobile dropdown */}
+                {openMenu === admin._id && (
+                  <div className="absolute right-0 top-10 z-20 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl">
+                    <button
+                      type="button"
+                      onClick={() => handleView(admin)}
+                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50"
+                    >
+                      <Eye size={15} />
+                      View administrator
+                    </button>
 
-                  {openMenu === org._id && (
-                    <div className="absolute right-0 top-10 z-20 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl">
-                      <button
-                        type="button"
-                        onClick={() => handleView(org)}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50"
-                      >
-                        <Eye size={15} />
-                        View administrators
-                      </button>
+                    <button
+                      type="button"
+                      onClick={() => handleEdit(admin)}
+                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50"
+                    >
+                      <Pencil size={15} />
+                      Manage
+                    </button>
 
-                      <button
-                        type="button"
-                        onClick={() => handleEdit(org)}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50"
-                      >
-                        <Pencil size={15} />
-                        Manage
-                      </button>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleStatus(admin)}
+                      className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50"
+                    >
+                      <Power size={15} />
 
-                      <button
-                        type="button"
-                        onClick={() => handleToggleStatus(org)}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50"
-                      >
-                        <Power size={15} />
-                        {org.isActive ? "Deactivate" : "Activate"}
-                      </button>
-                    </div>
-                  )}
-                </div>
+                      {admin.isActive ? "Deactivate" : "Activate"}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
 
         {/* =====================================================
-            EMPTY
+            EMPTY STATE
         ====================================================== */}
 
-        {filteredOrganizations.length === 0 && (
+        {filteredAdmins.length === 0 && (
           <div className="px-6 py-16 text-center">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
               <UsersRound size={22} />
             </div>
 
             <h3 className="mt-4 text-sm font-bold text-slate-950">
-              No organizations found
+              No administrators found
             </h3>
 
             <p className="mt-1 text-xs text-slate-400">
-              Try changing your search or organization filter.
+              Try changing your search or administrator filter.
             </p>
           </div>
         )}
@@ -546,7 +651,7 @@ const Administrator = ({
       ====================================================== */}
 
       <section className="mt-6 grid gap-6 lg:grid-cols-2">
-        {/* Create admin */}
+        {/* Create administrator */}
 
         <div className="rounded-3xl bg-slate-950 p-7 text-white">
           <div className="flex h-12 w-12 items-center justify-center rounded-[15px] bg-white/10 ring-1 ring-white/10">
@@ -616,7 +721,7 @@ const Administrator = ({
               </div>
 
               <p className="text-sm leading-6 text-slate-500">
-                An administrator must belong to one organization.
+                An administrator belongs to one organization.
               </p>
             </div>
 
@@ -626,7 +731,7 @@ const Administrator = ({
               </div>
 
               <p className="text-sm leading-6 text-slate-500">
-                Organization access is controlled by the Owner.
+                Administrator access is controlled by the Owner.
               </p>
             </div>
           </div>

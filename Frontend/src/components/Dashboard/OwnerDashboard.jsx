@@ -66,7 +66,7 @@ const OwnerDashboard = () => {
       console.log("Owner Dashboard Error:", error);
     });
   }, []);
-
+// console.log(analytics)
   // Active organizations
   const activeOrganizations =
     allOrgs?.filter((org) => org.isActive).length || 0;
@@ -155,6 +155,7 @@ const OwnerDashboard = () => {
         {activePage === "administrator" && (
           <Administrator 
           analytics={analytics} 
+          setAnalytics={setAnalytics}
           allOrgs={allOrgs} 
           adminisModal={adminisModal} 
           setAdminsModal={setAdminsModal}

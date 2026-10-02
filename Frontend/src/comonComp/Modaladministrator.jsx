@@ -26,8 +26,9 @@ const Modaladministrator = ({setAdminsModal, allOrgs}) => {
         email,
         password,
       });
-      console.log("Admin Created:", res.data)
+      // console.log("Admin Created:", res.data)
       setAdminsModal(false)
+      toast.success(`${name} is admin created successfuly`)
      } catch (error) {
         console.log("STATUS:", error.response?.status);
         console.log("BACKEND RESPONSE:", error.response?.data);
@@ -145,7 +146,7 @@ const Modaladministrator = ({setAdminsModal, allOrgs}) => {
           <button
             onClick={handleCreateAdminis}
             type="button"
-            className="rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-slate-950/10 transition hover:bg-slate-800"
+            className="rounded-xl cursor-pointer bg-slate-950 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-slate-950/10 transition hover:bg-slate-800"
           >
             Create Administrator
           </button>
