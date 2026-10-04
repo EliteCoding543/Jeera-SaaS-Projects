@@ -1,6 +1,48 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import CreateTeamsModal from "./CreateTeamsModal";
+import { activeTeam, deActiveTeam } from "../../API's/teamsAPI";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { updateTeamStatus } from "../../utlis/Redux/teamSlice";
 
-const AdminsTeam = () => {
+const AdminsTeam = ({teams = [], totalTeams = 0, totalEmployee = 0, user}) => {
+  // // Modal State
+  // console.log(totalEmployee)
+  const [openModal, setOpenModal] = useState(false)
+  const [teamLoadingId, setTeamLoadingId] = useState(null);
+  const dispatch = useDispatch()
+// Status update
+const handleChangeStatus = async(team) => {
+ if (teamLoadingId === team._id) return;
+ try {
+    setTeamLoadingId(team._id);
+    if(team.isActive){
+       await deActiveTeam(team._id)
+
+       dispatch(updateTeamStatus({
+          teamId : team._id,
+          isActive : false
+       })
+      );
+      toast.success(`${team.name} is deactivated Successfully`)
+    }
+
+    else {
+      await activeTeam(team._id)
+
+      dispatch(updateTeamStatus({
+         teamId : team._id,
+         isActive : true
+      })
+      )
+      toast.success(`${team.name} activated successfully`);
+    }
+ } catch (error) {
+    toast.error( error.response?.data?.message || "Failed to update team status" );
+ } finally {
+    setTeamLoadingId(null);
+ }
+}
   return (
     <main className="min-w-0 flex-1 bg-slate-50 px-6 py-8 lg:px-8">
       {/* Header */}
@@ -66,7 +108,7 @@ const AdminsTeam = () => {
                 <div className="mt-5 flex items-center gap-4">
 
                   <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-                    <span className="h-1.5 w-1.5 rounded-full bg-slate-600" />
+                     <span className="mx-1 inline-block h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.9)] animate-pulse" />
                     Team management
                   </div>
 
@@ -96,6 +138,7 @@ const AdminsTeam = () => {
 
                 {/* Create Team */}
                 <button
+                  onClick={() => setOpenModal(true)}
                   className="group flex h-12 items-center gap-3 rounded-xl bg-white px-5 text-sm font-semibold text-slate-950 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-xl"
                 >
 
@@ -123,7 +166,7 @@ const AdminsTeam = () => {
             Total Teams
           </p>
           <p className="mt-2 text-3xl font-bold text-slate-950">
-            8
+           {totalTeams}
           </p>
         </div>
 
@@ -132,65 +175,94 @@ const AdminsTeam = () => {
             Active Teams
           </p>
           <p className="mt-2 text-3xl font-bold text-emerald-600">
-            6
+            {teams.filter((item) => item.isActive).length}
           </p>
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
-            Employees
+           In Active Teams
           </p>
           <p className="mt-2 text-3xl font-bold text-slate-950">
-            24
+            {teams.filter((item) => !item.isActive).length}
           </p>
         </div>
       </div>
 
       {/* Teams */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {[1, 2, 3, 4, 5, 6].map((team) => (
-          <div
-            key={team}
-            className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-          >
-            <div className="mb-5 flex items-start justify-between">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-950 text-white">
-                <span className="text-sm font-bold">
-                  T
-                </span>
-              </div>
-
-              <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-600">
-                Active
+      {teams.map((team) => (
+        <div
+          key={team._id}
+          className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+        >
+          <div className="mb-5 flex items-start justify-between">
+            
+            {/* Team Avatar */}
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-950 text-white">
+              <span className="text-sm font-bold">
+                {team.name?.charAt(0).toUpperCase()}
               </span>
             </div>
 
-            <h2 className="text-lg font-bold text-slate-950">
-              Development Team
-            </h2>
-
-            <p className="mt-1 text-sm text-slate-400">
-              Software development and engineering
-            </p>
-
-            <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
-              <div>
-                <p className="text-xs text-slate-400">
-                  Members
-                </p>
-
-                <p className="mt-1 text-sm font-bold text-slate-700">
-                  6 Employees
-                </p>
-              </div>
-
-              <button className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-950">
-                View Team
-              </button>
-            </div>
+            {/* Status */}
+            <span
+              onClick={() => handleChangeStatus(team)}
+              className={`rounded-full cursor-pointer px-3 py-1.5 text-xs font-semibold ${
+                team.isActive
+                  ? "bg-emerald-50 text-emerald-600"
+                  : "bg-red-50 text-red-600"
+              }`}
+            >
+              {teamLoadingId === team._id ? (
+                <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-r-transparent" />
+              ) : team.isActive ? "Active" : "Inactive"}
+            </span>
           </div>
-        ))}
+
+          {/* Team Name */}
+          <h2 className="text-lg font-bold text-slate-950">
+            {team.name}
+          </h2>
+
+          {/* Description */}
+          <p className="mt-2 text-sm text-slate-400">
+            {/* <span className="font-medium text-slate-500">
+              {user.name}
+            </span> */}
+
+            <span className="mx-1 inline-block h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.9)] animate-pulse" />
+
+            <span className="text-slate-600">
+              {user.organizationId?.name || "No organization"}
+            </span>
+          </p>
+
+          <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+            <div>
+              <p className="text-xs text-slate-400">
+                Members
+              </p>
+
+              <p className="mt-1 text-sm font-bold text-slate-700">
+                {/* abhi backend mein member count nahi hai */}
+                Team members
+              </p>
+            </div>
+
+            <button className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-950">
+              View Team
+            </button>
+          </div>
+        </div>
+      ))}
       </div>
+
+      {
+        openModal && (
+          <CreateTeamsModal openModal={openModal} setOpenModal={setOpenModal}/>
+        )
+      }
     </main>
   );
 };

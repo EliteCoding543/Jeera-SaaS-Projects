@@ -17,11 +17,13 @@ import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const data =  useSelector(Store => Store.user)
   const nav = useNavigate();
 
   const handleLogout = async () => {
     try {
+      setLoading(true);
       await axios.post(
         import.meta.env.VITE_BACKEND_URL + "/auth/logout",
         {},
@@ -36,11 +38,13 @@ const Navbar = () => {
       toast.error(
         error.response?.data?.message || "Logout failed"
       );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <nav className="sticky top-0 z-50 h-18.25 border-b border-slate-800/80 bg-slate-950 px-5 sm:px-6">
+    <nav className="sticky top-0 z-50 h-18.25 border-b border-indigo-400/10 bg-linear-to-r from-[#080d1c] via-[#111936] to-[#0a1024] px-5 shadow-[0_8px_35px_rgba(15,23,42,0.35)] sm:px-6">
 
       <div className="flex h-full items-center justify-between">
 
@@ -187,12 +191,17 @@ const Navbar = () => {
 
                 <button
                   onClick={handleLogout}
+                  disabled={loading}
                   className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-400 transition hover:bg-red-500/10 hover:text-red-300"
                 >
-                  <LogOut size={17} strokeWidth={1.8} />
+                  {loading ? (
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent" />
+                  ) : (
+                    <LogOut size={17} strokeWidth={1.8} />
+                  )}
 
                   <span>
-                    Logout
+                    {loading ? "Logging out..." : "Logout"}
                   </span>
                 </button>
 

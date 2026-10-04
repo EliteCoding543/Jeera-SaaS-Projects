@@ -29,6 +29,7 @@ const OrgDashboard = ({
   const [statusFilter, setStatusFilter] = useState("all");
   const [openMenu, setOpenMenu] = useState(null);
   const [viewOrg, setViewOrg] = useState(null)
+  const [organizationLoadingId, setOrganizationLoadingId] = useState(null);
 // console.log(allOrgs)
   const filteredOrganizations = useMemo(() => {
     return allOrgs.filter((org) => {
@@ -47,28 +48,34 @@ const OrgDashboard = ({
     });
   }, [allOrgs, search, statusFilter]);
 
-  const handleEdit = (org) => {
-    console.log("Edit organization:", org);
-  };
+  // const handleEdit = (org) => {
+  //   console.log("Edit organization:", org);
+  // };
   // Active and Deactive Orga
   const handleStatusChange = async(org) => {
     // console.log("All obj", org.name)
-    if(org.isActive){
-       await deactivateOrg(org._id)
+    if (organizationLoadingId === org._id) return;
+    setOrganizationLoadingId(org._id);
+    try {
+      if(org.isActive){
+         await deactivateOrg(org._id)
+      }
+      else {
+         await activeOrgs(org._id, org.name)
+      }
+      setAllOrgs((prev) => 
+        prev.map((item) => 
+          item._id === org._id ? {...item, isActive : !item.isActive} : item
+        )
+      );
+      toast.success(
+        org.isActive
+          ? ` ${org.name} deactivated successfully`
+          : `${org.name} activated successfully`
+      );
+    } finally {
+      setOrganizationLoadingId(null);
     }
-    else {
-       await activeOrgs(org._id, org.name)
-    }
-    setAllOrgs((prev) => 
-      prev.map((item) => 
-        item._id === org._id ? {...item, isActive : !item.isActive} : item
-      )
-    );
-    toast.success(
-      org.isActive
-        ? ` ${org.name} deactivated successfully`
-        : `${org.name} activated successfully`
-    );
   };
 
   return (
@@ -342,7 +349,9 @@ const OrgDashboard = ({
 
                   <div>
 
-                    {org.isActive ? (
+              {organizationLoadingId === org._id ? (
+                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent" />
+              ) : org.isActive ? (
 
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
 

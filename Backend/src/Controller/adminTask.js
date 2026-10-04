@@ -103,11 +103,15 @@ export const createTask = async (req, res, next) => {
             createdBy: req.user._id
         });
 
+        const populatedTask = await Task.findById(createdTask._id)
+            .populate("assignedTo", "name email")
+            .populate("organizationId", "name");
+
         return res.status(201).json(
             new ResponseHandler(
                 201,
                 "Task created successfully",
-                createdTask
+                populatedTask
             )
         );
 
@@ -128,7 +132,9 @@ export const getAllTask = async (req, res, next) => {
 
         const allTask = await Task.find({
             organizationId
-        });
+        })
+            .populate("assignedTo", "name email")
+            .populate("organizationId", "name");
 
         return res.status(200).json(
             new ResponseHandler(

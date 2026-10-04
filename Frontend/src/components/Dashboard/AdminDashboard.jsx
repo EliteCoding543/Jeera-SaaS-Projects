@@ -1,73 +1,113 @@
 import React, { useState } from "react";
+
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import DashboardLoading from "../Dashboard/DashboardLoading";
-import AdminsEmployee from '../AdminDashboard/AdminsEmployee'
-import AdminTeam from '../AdminDashboard/AdminsTeam'
+
+import AdminsEmployee from "../AdminDashboard/AdminsEmployee";
+import AdminTeam from "../AdminDashboard/AdminsTeam";
+import AdminDashPre from "../AdminDashboard/AdminDashPre";
 
 import {
   LayoutDashboard,
   Building2,
   ShieldCheck,
+  ListTodo,
+  MessageCircle
 } from "lucide-react";
 
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
-
-import AdminDashPre from "../AdminDashboard/AdminDashPre";
 import useAdminDashboardData from "../../hooks/useAdminDashboardData";
+import Task from "../AdminDashboard/Task";
+import Chats from "../AdminDashboard/Chats";
 
 
 const links = [
   {
     label: "Dashboard",
     icon: LayoutDashboard,
-    key: "/dashboard",
+    key: "dashboard",
   },
   {
     label: "Teams",
     icon: Building2,
-    key: "/teams",
+    key: "teams",
   },
   {
     label: "Employees",
     icon: ShieldCheck,
-    key: "/employees",
+    key: "employees",
+  },
+  {
+    label: "Task",
+    icon: ListTodo,
+    key: "task",
+  },
+    {
+    label: "Chat",
+    icon: MessageCircle,
+    key: "chat",
   },
 ];
 
 
 const AdminDashboard = () => {
-  const [activePage, setActivePage] = useState("dashboard")
-  const location = useLocation();
+
+  const [activePage, setActivePage] = useState("dashboard");
 
   const { loading } = useAdminDashboardData();
 
-  const { teams = [], totalTeams = 0 } = useSelector(
+
+  // Teams
+  const {
+    teams = [],
+    totalTeams = 0,
+  } = useSelector(
     (store) => store.teams
   );
 
+
+  // Tasks
   const { task = [], totalTask = 0 } = useSelector(
     (store) => store.task
   );
+  // console.log(totalTask)
 
-  const { employee = [], totalEmployee = 0 } = useSelector(
+
+  // User
+  const user = useSelector(
+    (store) => store.user
+  );
+
+
+  // Employees
+  const {
+    employee = [],
+    totalEmployee = 0,
+  } = useSelector(
     (store) => store.employee
   );
 
 
+  // Completed Tasks
   const completedTasks = task.filter(
     (item) => item.status === "completed"
   ).length;
 
+
+  // Todo Tasks
   const todoTasks = task.filter(
     (item) => item.status === "todo"
   ).length;
 
+
+  // In Progress Tasks
   const inProgressTasks = task.filter(
     (item) => item.status === "in-progress"
   ).length;
 
+
+  // Completion Rate
   const completionRate =
     totalTask > 0
       ? Math.round(
@@ -85,15 +125,19 @@ const AdminDashboard = () => {
 
         <Sidebar
           links={links}
-          // active={location.pathname}
+          activePage={activePage}
           setActivePage={setActivePage}
         />
 
+
         {loading ? (
+
           <main className="min-w-0 flex-1">
             <DashboardLoading />
           </main>
-        ) : activePage === "/dashboard" ? (
+
+        ) : activePage === "dashboard" ? (
+
           <AdminDashPre
             teams={teams}
             totalTeams={totalTeams}
@@ -106,10 +150,30 @@ const AdminDashboard = () => {
             inProgressTasks={inProgressTasks}
             completionRate={completionRate}
           />
-        ) : activePage === "/teams" ? (
-          <AdminTeam teams={teams} />
-        ) : activePage === "/employees" ? (
-          <AdminsEmployee  employee={employee} />
+
+        ) : activePage === "teams" ? (
+
+          <AdminTeam
+            teams={teams}
+            user={user}
+            totalTeams={totalTeams}
+            totalEmployee={totalEmployee}
+          />
+
+        ) : activePage === "employees" ? (
+
+          <AdminsEmployee
+            employee={employee}
+            totalEmployee={totalEmployee}
+          />
+
+        ) : activePage === "task" ? (
+          <Task 
+            task={task}
+            totalTask={totalTask}
+          />
+        ) : activePage === "chat" ? (
+          <Chats />
         ) : null}
 
       </div>

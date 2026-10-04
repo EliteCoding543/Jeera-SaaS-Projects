@@ -26,6 +26,7 @@ const Modaladministrator = ({
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
 
   // -----------------------------
   // Edit Admin Data -> Form State Create and edit both satate mange here
@@ -67,6 +68,7 @@ const Modaladministrator = ({
       }
 
       try {
+        setLoading(true);
         const res = await activedAdmins(editAdmin._id, {
           name,
           email,
@@ -79,6 +81,8 @@ const Modaladministrator = ({
           error.response?.data?.message ||
             "Failed to update administrator"
         );
+      } finally {
+        setLoading(false);
       }
 
       return;
@@ -92,6 +96,7 @@ const Modaladministrator = ({
     }
 
     try {
+      setLoading(true);
       const res = await createAdministrator(
         selectedOrganization,
         {
@@ -111,6 +116,8 @@ const Modaladministrator = ({
         error.response?.data?.message ||
           "Failed to create administrator"
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -257,9 +264,12 @@ const Modaladministrator = ({
 
             <button
               type="submit"
+              disabled={loading}
               className="cursor-pointer rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-slate-950/10 transition hover:bg-slate-800"
             >
-              {editAdmin
+              {loading
+                ? editAdmin ? "Updating..." : "Creating..."
+                : editAdmin
                 ? "Update Administrator"
                 : "Create Administrator"}
             </button>

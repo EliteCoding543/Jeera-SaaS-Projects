@@ -17,6 +17,7 @@ import {
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
  
   const nav = useNavigate()
   const[formData , setFormData] = useState({
@@ -36,6 +37,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
+    setLoading(true);
     const res = await axios.post(
       import.meta.env.VITE_BACKEND_URL + "/auth/login",
       formData,
@@ -50,6 +52,8 @@ const handleSubmit = async (e) => {
     toast.error(
       error.response?.data?.message || "Invalid Credentials"
     );
+  } finally {
+    setLoading(false);
   }
 };
   return (
@@ -421,9 +425,10 @@ const handleSubmit = async (e) => {
               {/* Submit */}
               <button
                 type="submit"
+                disabled={loading}
                 className="group cursor-pointer w-full h-12 rounded-xl bg-white text-black font-semibold flex items-center justify-center gap-2 hover:bg-gray-200 transition shadow-xl shadow-white/5"
               >
-                Sign in
+                {loading ? "Signing in..." : "Sign in"}
 
                 <ArrowRight
                   size={17}

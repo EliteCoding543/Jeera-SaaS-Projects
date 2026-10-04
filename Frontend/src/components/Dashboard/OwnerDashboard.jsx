@@ -11,6 +11,7 @@ import OnwerDashboradPre from "./OnwerDashboradPre";
 import DashboardLoading from "./DashboardLoading";
 import OrgDashboard from "./OrgDashboard";
 import Administrator from "./Administrator";
+import { useSelector } from "react-redux";
 
 const links = [
   {
@@ -33,15 +34,18 @@ const links = [
 const OwnerDashboard = () => {
   const [analytics, setAnalytics] = useState(null);
   const [allOrgs, setAllOrgs] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const[adminisModal, setAdminsModal] = useState(false)
 
+  const user = useSelector((store) => store.user)
   // Active page state
   const [activePage, setActivePage] = useState("dashboard");
 
   useEffect(() => {
+    setLoading(true);
     const p = Promise.all([
       axios.get(
         import.meta.env.VITE_BACKEND_URL + "/analytics",
@@ -64,6 +68,8 @@ const OwnerDashboard = () => {
       setAllOrgs(arr[1].data.data);
     }).catch((error) => {
       console.log("Owner Dashboard Error:", error);
+    }).finally(() => {
+      setLoading(false);
     });
   }, []);
 // console.log(analytics)
@@ -107,11 +113,14 @@ const OwnerDashboard = () => {
 
         {activePage === "dashboard" && (
           <>
-            {analytics ? (
+            {loading ? (
+              <DashboardLoading />
+            ) : analytics ? (
 
               <OnwerDashboradPre
                 analytics={analytics}
                 allOrgs={allOrgs}
+                user={user}
                 activeOrganizations={activeOrganizations}
                 inactiveOrganizations={inactiveOrganizations}
                 totalOrganizations={totalOrganizations}
@@ -121,13 +130,7 @@ const OwnerDashboard = () => {
                 setActivePage={setActivePage}
               />
 
-            ) : (
-
-             /* =====================================================
-                 LOADING
-              ====================================================== */
-                <DashboardLoading />
-            )}
+            ) : null}
           </>
         )}
 
@@ -136,9 +139,9 @@ const OwnerDashboard = () => {
         ====================================================== */}
 
         {activePage === "organization" && (
-          <OrgDashboard 
+          loading ? <DashboardLoading /> : <OrgDashboard 
             analytics={analytics}
-            allOrgs={allOrgs}
+            allOrgs={allOrgs || []}
             setAllOrgs={setAllOrgs}
             activeOrganizations={activeOrganizations}
             inactiveOrganizations={inactiveOrganizations}
@@ -154,10 +157,10 @@ const OwnerDashboard = () => {
         ====================================================== */}
 
         {activePage === "administrator" && (
-          <Administrator 
+          loading ? <DashboardLoading /> : <Administrator 
           analytics={analytics} 
           setAnalytics={setAnalytics}
-          allOrgs={allOrgs} 
+          allOrgs={allOrgs || []} 
           setAllOrgs={setAllOrgs}
           adminisModal={adminisModal} 
           setAdminsModal={setAdminsModal}

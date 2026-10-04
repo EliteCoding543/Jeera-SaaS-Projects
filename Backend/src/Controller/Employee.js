@@ -76,7 +76,6 @@ export const getAllEmployee = async (req, res, next) => {
             teamId,
             organizationId: req.user.organizationId._id,
             role: "employee",
-            isActive: true
         });
 
         return res.status(200).json(
@@ -163,52 +162,45 @@ export const deleteEmployee = async(req, res, next) => {
     }
 }
 
-export const updateEmployee = async(req, res, next) => {
-    try {
-        const{ employeeId } = req.params
-        if(!mongoose.Types.ObjectId.isValid(employeeId)){
-            return next(new ErrorHandler(401, "Invalid is Id"))
-        }
+export const updateEmployee = async (req, res, next) => {
+  try {
+    const { employeeId } = req.params;
 
-
-        // const foundEmployee = await User.findOne({
-        //     _id : employeeId,
-        //     organizationId : req.user.organizationId._id
-        // })
-
-
-        // if(!foundEmployee)
-        // {
-        //     throw new AppError(404, "User does not exists")
-        // }
-        
-
-        const{teamId, isActive} = req.body
-        // foundEmployee.teamdId = teamId
-        // foundEmployee.isActive = isActive
-
-        const foundEmployee = await User.findOneAndUpdate(
-            {_id : employeeId, organizationId : req.user.organizationId._id}, 
-            {teamdId : teamId, isActive}, 
-            { runValidators : true, returnDocument : "after" })
-
-          User.fin
-
-
-        // await foundEmployee.save()
-
-        res
-        .status(200)
-        .json(
-            new ResponseHandler(
-                200,
-                "update Employee successfully",
-                foundEmployee
-            )
-        )
-
-
-    } catch (error) {
-        next(error)
+    if (!mongoose.Types.ObjectId.isValid(employeeId)) {
+      return next(new ErrorHandler(400, "Invalid Employee ID"));
     }
-}
+
+    const { teamId, isActive } = req.body;
+
+    const foundEmployee = await User.findOneAndUpdate(
+      {
+        _id: employeeId,
+        organizationId: req.user.organizationId._id,
+        role: "employee",
+      },
+      {
+        teamId,
+        isActive,
+      },
+      {
+        runValidators: true,
+        returnDocument: "after",
+      }
+    );
+
+    if (!foundEmployee) {
+      return next(new ErrorHandler(404, "Employee does not exist"));
+    }
+
+    return res.status(200).json(
+      new ResponseHandler(
+        200,
+        "Employee updated successfully",
+        foundEmployee
+      )
+    );
+
+  } catch (error) {
+    next(error);
+  }
+};

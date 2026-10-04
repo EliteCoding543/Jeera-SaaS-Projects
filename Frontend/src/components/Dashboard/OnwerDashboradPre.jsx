@@ -21,7 +21,8 @@ const OnwerDashboradPre = ({
   activePercentage,
   isModalOpen,
   setIsModalOpen,
-  setActivePage
+  setActivePage,
+  user
 }) => {
   return (
     <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
@@ -60,12 +61,12 @@ const OnwerDashboradPre = ({
 
             </div>
 
-            <h1 className="max-w-xl text-3xl font-bold tracking-[-0.03em] text-white sm:text-4xl">
+            <h1 className="max-w-xl text-3xl  font-bold tracking-[-0.03em] text-white sm:text-4xl">
 
-              Your workspace,
+              Welcome Back's
 
-              <span className="text-slate-400">
-                {" "}at a glance.
+              <span className="text-slate-400 text-2xl mx-3">
+                {user.name}.
               </span>
 
             </h1>

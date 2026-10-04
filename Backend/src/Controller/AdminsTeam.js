@@ -43,7 +43,7 @@ export const getAllTeams = async (req, res, next) => {
 
         const foundTeams = await Team.find({
             organizationId,
-            isActive: true,
+            // isActive: true,
         });
         // console.log("FOUND TEAMS:", foundTeams);
         return res.status(200).json(
@@ -144,12 +144,12 @@ export const deleteTeams = async (req, res, next) => {
 // Activate Teams
 export const updateTeams = async(req, res, next) => {
     try {
-        const { name , isActive} = req.body;
+        // const { name , isActive} = req.body;
         const { id } = req.params
         
-        if(!name.trim() || name.trim().length > 50){
-            return next(new ErrorHandler(400, `${name} is invalid`))
-        }
+        // if(!name.trim() || name.trim().length > 50){
+        //     return next(new ErrorHandler(400, `${name} is invalid`))
+        // }
 
         const foundTeams = await Team.findOne({
             _id : id,
