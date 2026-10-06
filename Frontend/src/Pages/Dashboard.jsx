@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import AdminDashboard from "../components/Dashboard/AdminDashboard";
 import OwnerDashboard from "../components/Dashboard/OwnerDashboard";
+import EmployeeDashborad from "../components/Employee/EmployeeDashborad";
 
 
 const Dashboard = () => {
@@ -17,7 +18,10 @@ const Dashboard = () => {
   {
     return <AdminDashboard />
   }
-
+  else if(user.role == "employee")
+  {
+    return <EmployeeDashborad />
+  }
 
 
   return null

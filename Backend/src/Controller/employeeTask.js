@@ -1,17 +1,14 @@
-import ErrorHandler from "../Utlis/ErrorHandler.js"
-import Task  from '../Models/Task.schema.js'
-import ResponseHandler from "../Utlis/ResponseHandler.js"
+import ErrorHandler from "../Utlis/ErrorHandler.js";
+import Task from "../Models/Task.schema.js";
+import ResponseHandler from "../Utlis/ResponseHandler.js";
 import mongoose from "mongoose";
 
-
-
-
+// Get all tasks assigned to logged-in employee
 export const getAllEmployeeTask = async (req, res, next) => {
     try {
-        const id = req.user._id;
-
         const allEmployeeTask = await Task.find({
-            assignedTo: id
+            assignedTo: req.user._id,
+            organizationId: req.user.organizationId._id
         });
 
         if (allEmployeeTask.length === 0) {
@@ -37,48 +34,67 @@ export const getAllEmployeeTask = async (req, res, next) => {
 };
 
 
-export const getTaskEmployeeById = async(req, res, next) => {
+// Get single task by ID
+export const getTaskEmployeeById = async (req, res, next) => {
     try {
-        const { tasksId } = req.params
-        if(!mongoose.Types.ObjectId.isValid(tasksId)){
-            return next(new ErrorHandler(400, "Invalid tasks Id"))
+        const { tasksId } = req.params;
+
+        // Validate task ID
+        if (!mongoose.Types.ObjectId.isValid(tasksId)) {
+            return next(
+                new ErrorHandler(
+                    400,
+                    "Invalid task ID"
+                )
+            );
         }
 
         const data = await Task.findOne({
-            _id : tasksId,
-            assignedTo : req.user._id,
+            _id: tasksId,
+            assignedTo: req.user._id,
             organizationId: req.user.organizationId._id
-        })
+        });
 
-        if(!data){
-            return next(new ErrorHandler(404, `task is  not found`))
+        if (!data) {
+            return next(
+                new ErrorHandler(
+                    404,
+                    "Task is not found"
+                )
+            );
         }
 
-        res.status(200)
-        .json(
+        return res.status(200).json(
             new ResponseHandler(
                 200,
-                "Get Task successfully",
+                "Task successfully fetched",
                 data
             )
-        )
+        );
 
     } catch (error) {
-        next(error)
+        next(error);
     }
-}
+};
 
+
+// Update employee task status
 export const updateEmployeeTask = async (req, res, next) => {
     try {
         const { tasksId } = req.params;
         const { status } = req.body;
 
+        // Validate task ID
         if (!mongoose.Types.ObjectId.isValid(tasksId)) {
             return next(
-                new ErrorHandler(400, "Invalid Task ID")
+                new ErrorHandler(
+                    400,
+                    "Invalid task ID"
+                )
             );
         }
 
+        // Validate status
         if (
             !status ||
             !["todo", "in-progress", "completed"].includes(status)
@@ -108,7 +124,10 @@ export const updateEmployeeTask = async (req, res, next) => {
 
         if (!updateTask) {
             return next(
-                new ErrorHandler(404, "Task not found")
+                new ErrorHandler(
+                    404,
+                    "Task not found"
+                )
             );
         }
 

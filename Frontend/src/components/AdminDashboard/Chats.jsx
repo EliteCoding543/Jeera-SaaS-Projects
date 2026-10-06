@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   MessageCircle,
   Search,
   MoreVertical,
-  Circle,
 } from "lucide-react";
+import ChatBox from "./ChatBox";
+import { useSelector } from "react-redux";
 
 const Chats = () => {
+  const [selectedUser, setSelectedUser] = useState(null);
+  const {employee = []} = useSelector((store) => store.employee)
+  // console.log(employee)
+
   return (
     <main className="min-w-0 flex-1 bg-slate-50 px-6 py-8 lg:px-8">
 
@@ -45,10 +50,8 @@ const Chats = () => {
             </div>
 
           </div>
-
         </div>
       </div>
-
 
       {/* Chat Section */}
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -80,188 +83,76 @@ const Chats = () => {
 
         </div>
 
-
         {/* Employee List */}
         <div className="divide-y divide-slate-100">
 
-          {/* Employee 1 */}
-          <div className="group flex cursor-pointer items-center justify-between px-6 py-4 transition hover:bg-slate-50">
+          {employee.map((employee) => (
+            <div
+              key={employee._id}
+              onClick={() => setSelectedUser(employee)}
+              className="group flex cursor-pointer items-center justify-between px-6 py-4 transition hover:bg-slate-50"
+            >
 
-            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4">
 
-              <div className="relative">
+                <div className="relative">
 
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-indigo-500 to-violet-600 text-sm font-bold text-white">
-                  SK
+                  <div
+                    className={`flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br ${employee.avatar} text-sm font-bold text-white`}
+                  >
+                    {employee.initials}
+                  </div>
+
+                  <span
+                    className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white ${
+                      employee.online
+                        ? "bg-emerald-500"
+                        : "bg-slate-300"
+                    }`}
+                  />
+
                 </div>
 
-                <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500" />
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    {employee.name}
+                  </h3>
 
-              </div>
-
-              <div>
-
-                <h3 className="text-sm font-semibold text-slate-900">
-                  Shubham Kumar
-                </h3>
-
-                <p className="mt-1 text-xs text-slate-400">
-                  Developer
-                </p>
-
-              </div>
-
-            </div>
-
-            <div className="flex items-center gap-4">
-
-              <span className="text-xs text-slate-400">
-                Online
-              </span>
-
-              <button className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 opacity-0 transition group-hover:bg-slate-100 group-hover:opacity-100">
-                <MoreVertical className="h-4 w-4" />
-              </button>
-
-            </div>
-
-          </div>
-
-
-          {/* Employee 2 */}
-          <div className="group flex cursor-pointer items-center justify-between px-6 py-4 transition hover:bg-slate-50">
-
-            <div className="flex items-center gap-4">
-
-              <div className="relative">
-
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-cyan-500 to-blue-600 text-sm font-bold text-white">
-                  AK
+                  <p className="mt-1 text-xs text-slate-400">
+                    {employee.role}
+                  </p>
                 </div>
 
-                <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500" />
-
               </div>
 
-              <div>
+              <div className="flex items-center gap-4">
 
-                <h3 className="text-sm font-semibold text-slate-900">
-                  Aman Kumar
-                </h3>
+                <span className="text-xs text-slate-400">
+                  {employee.online ? "Online" : "Offline"}
+                </span>
 
-                <p className="mt-1 text-xs text-slate-400">
-                  UI Developer
-                </p>
-
-              </div>
-
-            </div>
-
-            <div className="flex items-center gap-4">
-
-              <span className="text-xs text-slate-400">
-                Online
-              </span>
-
-              <button className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 opacity-0 transition group-hover:bg-slate-100 group-hover:opacity-100">
-                <MoreVertical className="h-4 w-4" />
-              </button>
-
-            </div>
-
-          </div>
-
-
-          {/* Employee 3 */}
-          <div className="group flex cursor-pointer items-center justify-between px-6 py-4 transition hover:bg-slate-50">
-
-            <div className="flex items-center gap-4">
-
-              <div className="relative">
-
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-amber-500 to-orange-600 text-sm font-bold text-white">
-                  RV
-                </div>
-
-                <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-slate-300" />
-
-              </div>
-
-              <div>
-
-                <h3 className="text-sm font-semibold text-slate-900">
-                  Rahul Verma
-                </h3>
-
-                <p className="mt-1 text-xs text-slate-400">
-                  Backend Developer
-                </p>
+                <button
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 opacity-0 transition group-hover:bg-slate-100 group-hover:opacity-100"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </button>
 
               </div>
 
             </div>
-
-            <div className="flex items-center gap-4">
-
-              <span className="text-xs text-slate-400">
-                Offline
-              </span>
-
-              <button className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 opacity-0 transition group-hover:bg-slate-100 group-hover:opacity-100">
-                <MoreVertical className="h-4 w-4" />
-              </button>
-
-            </div>
-
-          </div>
-
-
-          {/* Employee 4 */}
-          <div className="group flex cursor-pointer items-center justify-between px-6 py-4 transition hover:bg-slate-50">
-
-            <div className="flex items-center gap-4">
-
-              <div className="relative">
-
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-pink-500 to-rose-600 text-sm font-bold text-white">
-                  PS
-                </div>
-
-                <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500" />
-
-              </div>
-
-              <div>
-
-                <h3 className="text-sm font-semibold text-slate-900">
-                  Priya Sharma
-                </h3>
-
-                <p className="mt-1 text-xs text-slate-400">
-                  Frontend Developer
-                </p>
-
-              </div>
-
-            </div>
-
-            <div className="flex items-center gap-4">
-
-              <span className="text-xs text-slate-400">
-                Online
-              </span>
-
-              <button className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 opacity-0 transition group-hover:bg-slate-100 group-hover:opacity-100">
-                <MoreVertical className="h-4 w-4" />
-              </button>
-
-            </div>
-
-          </div>
+          ))}
 
         </div>
-
       </div>
+
+      {/* Chat Box */}
+      {selectedUser && (
+        <ChatBox
+          user={selectedUser}
+          onClose={() => setSelectedUser(null)}
+        />
+      )}
 
     </main>
   );

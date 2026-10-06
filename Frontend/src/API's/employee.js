@@ -36,3 +36,21 @@ export const getEmployee = (teamId) => {
     );
 
 };
+
+// Now get employee me task
+export const getEmployeTask = () => {
+    return axios.get(`${api}/employee/tasks`, 
+        {
+            withCredentials : true
+        }
+    )
+}
+
+// Chats employee 
+export const getAllEmployeesChats = () => {
+    return axios.get(`${api}/chat/`, 
+        {
+            withCredentials : true
+        }
+    )
+}

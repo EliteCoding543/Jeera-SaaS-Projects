@@ -47,7 +47,7 @@ const useAdminDashboardData = () => {
         // Tasks
         const taskRes = await getAllAdminTask();
 
-        console.log("Get Task Response :", taskRes.data);
+        // console.log("Get Task Response :", taskRes.data);
 
         dispatch(
           addAdminTask({

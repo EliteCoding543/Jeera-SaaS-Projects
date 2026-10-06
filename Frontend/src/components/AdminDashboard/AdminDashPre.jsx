@@ -5,6 +5,7 @@ import {
   BriefcaseBusiness,
   ArrowUpRight,
   MoreHorizontal,
+  Building2,
 } from "lucide-react";
 
 import { useSelector } from "react-redux";
@@ -31,20 +32,93 @@ const AdminDashPre = ({
           HEADER
       ========================= */}
 
-      <div className="mb-8">
+<div className="mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
 
-        <p className="mb-2 text-sm font-medium text-slate-500">
-          Organization Overview
-        </p>
+  {/* Organization Header */}
+  <div className="relative overflow-hidden bg-slate-950 px-7 py-7">
 
-        <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-950">
-            Welcome Back
-          </h1>
+    {/* Background Glow */}
+    <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-indigo-500/20 blur-3xl" />
 
-          <p className="text-2xl  text-slate-700">
+    <div className="absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-violet-500/10 blur-3xl" />
+
+    <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+
+      {/* Organization Info */}
+      <div className="flex items-center gap-4">
+
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-white shadow-lg backdrop-blur-sm">
+          <Building2 className="h-6 w-6" />
+        </div>
+
+        <div>
+
+          <div className="mb-1 flex items-center gap-2">
+
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">
+              Organization
+            </p>
+
+            <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-emerald-300">
+              Active
+            </span>
+
+          </div>
+
+          <h2 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
+            {user?.organizationId?.name || "Your Organization"}
+          </h2>
+
+          <p className="mt-1 text-xs text-slate-400">
+            Organization workspace
+          </p>
+
+        </div>
+
+      </div>
+
+      {/* Admin Profile */}
+      <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
+
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-sm font-bold text-slate-950">
+          {user?.name?.charAt(0)?.toUpperCase() || "A"}
+        </div>
+
+        <div>
+
+          <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
+            Admin
+          </p>
+
+          <p className="text-sm font-semibold text-white">
             {user?.name || "Admin"}
           </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  {/* Welcome Section */}
+  <div className="px-7 py-6">
+
+    <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+
+      <div>
+
+        <div className="flex flex-wrap items-center gap-2">
+
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950">
+            Welcome back,
+          </h1>
+
+          <span className="text-2xl font-semibold tracking-tight text-indigo-600">
+            {user?.name || "Admin"}
+          </span>
+
         </div>
 
         <p className="mt-2 text-sm text-slate-500">
@@ -52,6 +126,24 @@ const AdminDashPre = ({
         </p>
 
       </div>
+
+      <div className="hidden text-right sm:block">
+
+        <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+          Workspace
+        </p>
+
+        <p className="mt-1 text-sm font-semibold text-slate-700">
+          Admin Dashboard
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
 
 
       {/* =========================

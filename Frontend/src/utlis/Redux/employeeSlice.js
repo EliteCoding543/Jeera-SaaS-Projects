@@ -27,12 +27,19 @@ export const employeesSlice = createSlice({
         employee.isActive = isActive;
       }
     },
+
+    // Chat employee store in redux
+    chatAllEmployee : (state, action) => {
+      state.employee = action.payload.AllEmployee,
+      state.totalEmployee = action.payload.totalEmployee
+    }
   },
 });
 
 export const {
   addEmployees,
   updateEmployeeStatus,
+  chatAllEmployee,
 } = employeesSlice.actions;
 
 export default employeesSlice.reducer;
