@@ -28,7 +28,7 @@ export const deActiveTeam = (id) => {
 }
 export const getAllTeams = () => {
     return axios.get(`
-        ${api }/admin/teams`,
+        ${api}/admin/teams`,
         {
             withCredentials : true
         }

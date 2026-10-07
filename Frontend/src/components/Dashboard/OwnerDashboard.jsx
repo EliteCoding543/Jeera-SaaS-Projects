@@ -45,6 +45,7 @@ const OwnerDashboard = () => {
   const [activePage, setActivePage] = useState("dashboard");
 
   useEffect(() => {
+    if (user?.role !== "owner") return;
     setLoading(true);
     const p = Promise.all([
       axios.get(

@@ -48,9 +48,15 @@ export const getEmployeTask = () => {
 
 // Chats employee 
 export const getAllEmployeesChats = () => {
-    return axios.get(`${api}/chat/`, 
+    return axios.get(`${api}/chat`, 
         {
             withCredentials : true
         }
     )
+}
+
+export const getConversation = (userId) => {
+    return axios.get(`${api}/chat/${userId}/messages`, {
+        withCredentials: true
+    })
 }

@@ -11,19 +11,10 @@ export const getAllEmployeeTask = async (req, res, next) => {
             organizationId: req.user.organizationId._id
         });
 
-        if (allEmployeeTask.length === 0) {
-            return next(
-                new ErrorHandler(
-                    404,
-                    "No task found for this employee"
-                )
-            );
-        }
-
         return res.status(200).json(
             new ResponseHandler(
                 200,
-                "All employee tasks successfully fetched",
+                "Employee tasks successfully fetched",
                 allEmployeeTask
             )
         );

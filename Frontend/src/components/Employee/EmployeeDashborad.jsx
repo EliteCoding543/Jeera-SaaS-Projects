@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import useAdminDashboardData from "../../hooks/useAdminDashboardData";
-import DashboardLoading from "../Dashboard/DashboardLoading";
 import EmpDashboard from "./EmpDashboard";
 import Navbar from "../Dashboard/Navbar";
 import Sidebar from "../Dashboard/Sidebar";
@@ -17,7 +15,6 @@ import Chats from '../AdminDashboard/Chats'
 
 const EmployeeDashborad = () => {
   const [activePage, setActivePage] = useState("dashboard");
-  const { loading } = useAdminDashboardData();
 
 
   const links = [
@@ -78,7 +75,7 @@ const EmployeeDashborad = () => {
                 >
                   <Icon size={18} strokeWidth={2} />
 
-                  {link.lable}
+                  {link.label}
                 </button>
               );
             })}
@@ -89,49 +86,23 @@ const EmployeeDashborad = () => {
 
         {/* Dashboard */}
         {activePage === "dashboard" && (
-          <>
-            {loading ? (
-              <DashboardLoading />
-            ) : (
-              <EmpDashboard />
-            )}
-          </>
+          <EmpDashboard />
         )}
 
         {/* Task */}
         {activePage === "task" && (
-          <>
-            {loading ? (
-              <DashboardLoading />
-            ) : (
-              <TaskEmployee />
-            )}
-          </>
+          <TaskEmployee />
         )}
 
         {/* Profile */}
         {activePage === "profile" && (
-          <>
-            {loading ? (
-              <DashboardLoading />
-            ) : (
-              <Profile />
-            )}
-          </>
+          <Profile />
         )}
 
         {/* Chat  */}
         {
           activePage === "chat" && (
-            <>
-             {
-              loading ? (
-                <DashboardLoading />
-              ) : (
-                <Chats />
-              )
-             }
-            </>
+            <Chats />
           )
         }
 

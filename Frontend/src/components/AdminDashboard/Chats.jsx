@@ -1,16 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MessageCircle,
   Search,
   MoreVertical,
 } from "lucide-react";
 import ChatBox from "./ChatBox";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllEmployeesChats } from "../../API's/employee";
+import { chatAllEmployee } from "../../utlis/Redux/employeeSlice";
 
 const Chats = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const {employee = []} = useSelector((store) => store.employee)
-  // console.log(employee)
+  const dispatch = useDispatch()
+ 
+  useEffect(() => {
+    const fetchEmployee = async() => {
+      try {
+        const res = await getAllEmployeesChats()
+
+        dispatch(chatAllEmployee(res.data.data))
+      } catch (error) {
+        console.error("Failed to fetch employees for chat:", error.message)
+      }
+    }
+    fetchEmployee()
+  }, [dispatch])
 
   return (
     <main className="min-w-0 flex-1 bg-slate-50 px-6 py-8 lg:px-8">
@@ -93,42 +108,45 @@ const Chats = () => {
               className="group flex cursor-pointer items-center justify-between px-6 py-4 transition hover:bg-slate-50"
             >
 
+            <div className="flex items-center gap-4">
+              <div
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-linear-to-br ${employee.avatar} text-sm font-bold text-black shadow-md`}
+              >
+                {employee.name
+                  ?.split(" ")
+                  .map((name) => name[0])
+                  .slice(0, 2)
+                  .join("")
+                  .toUpperCase()}
+              </div>
+
+              <div className="min-w-0">
+                <h3 className="truncate text-sm font-semibold text-slate-900">
+                  {employee.name}
+                </h3>
+                  <p className="mt-1 text-xs capitalize text-slate-600">{employee.email}</p>
+                <p className="mt-1 text-xs capitalize text-slate-400">
+                  {employee.role}
+                </p>
+              </div>
+            </div>
+
               <div className="flex items-center gap-4">
 
-                <div className="relative">
-
-                  <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br ${employee.avatar} text-sm font-bold text-white`}
-                  >
-                    {employee.initials}
-                  </div>
-
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                    employee.isActive
+                      ? "bg-emerald-50 text-emerald-600 ring-1 ring-inset ring-emerald-200"
+                      : "bg-slate-100 text-slate-500 ring-1 ring-inset ring-slate-200"
+                  }`}
+                >
                   <span
-                    className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white ${
-                      employee.online
-                        ? "bg-emerald-500"
-                        : "bg-slate-300"
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      employee.isActive ? "bg-emerald-500" : "bg-slate-400"
                     }`}
                   />
 
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900">
-                    {employee.name}
-                  </h3>
-
-                  <p className="mt-1 text-xs text-slate-400">
-                    {employee.role}
-                  </p>
-                </div>
-
-              </div>
-
-              <div className="flex items-center gap-4">
-
-                <span className="text-xs text-slate-400">
-                  {employee.online ? "Online" : "Offline"}
+                  {employee.isActive ? "Active" : "Inactive"}
                 </span>
 
                 <button
@@ -151,6 +169,7 @@ const Chats = () => {
         <ChatBox
           user={selectedUser}
           onClose={() => setSelectedUser(null)}
+          employee={employee}
         />
       )}
 

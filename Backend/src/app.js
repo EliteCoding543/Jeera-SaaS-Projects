@@ -6,6 +6,10 @@ import cors from 'cors'
 import cookieParse from 'cookie-parser'
 import http from 'http'
 import { Server } from 'socket.io'
+import jwt from 'jsonwebtoken'
+import User from './Models/User.Schema.js'
+import Message from './Models/Message.Schema.js'
+import { findChatUser } from './Controller/Chats.js'
 
 // ================= ROUTES =================
 import UserRoutes from './Routes/User.routes.js'
@@ -33,10 +37,83 @@ const io = new Server(server, {
   },
 });
 
-// Connection create here
+// Authenticate sockets with the same JWT cookie used by the HTTP API.
+io.use(async (socket, next) => {
+    try {
+        const cookieHeader = socket.handshake.headers.cookie || ""
+        const tokenCookie = cookieHeader
+            .split(";")
+            .map((cookie) => cookie.trim())
+            .find((cookie) => cookie.startsWith("token="))
+        const token = tokenCookie && decodeURIComponent(tokenCookie.slice(6))
 
-io.on("connection", () => {
-    console.log("Socket is connected")
+        if (!token) return next(new Error("Authentication required"))
+
+        const decodedToken = jwt.verify(token, process.env.JWT_TOKEN)
+        const user = await User.findById(decodedToken._id).populate("organizationId")
+
+        if (!user || !["employee", "admin"].includes(user.role) || !user.isActive) {
+            return next(new Error("You are not authorized to use chat"))
+        }
+        if (user.organizationId && !user.organizationId.isActive) {
+            return next(new Error("Organization is inactive"))
+        }
+
+        socket.data.user = user
+        next()
+    } catch (error) {
+        next(new Error("Authentication failed"))
+    }
+})
+
+// Keep every user's active socket IDs so messages go to the right person.
+const connectedUsers = new Map()
+
+io.on("connection", (socket) => {
+    const userId = String(socket.data.user._id)
+
+    if (userId) {
+        const userSockets = connectedUsers.get(userId) || new Set()
+        userSockets.add(socket.id)
+        connectedUsers.set(userId, userSockets)
+    }
+
+    socket.on("send-msg", async ({ receiverId, msg } = {}, acknowledge = () => {}) => {
+        try {
+            if (!receiverId || String(receiverId) === userId || typeof msg !== "string" || !msg.trim()) {
+                return acknowledge({ success: false, message: "A receiver and message are required" })
+            }
+
+            const receiver = await findChatUser(receiverId, socket.data.user.organizationId._id)
+            const savedMessage = await Message.create({
+                sender: socket.data.user._id,
+                receiver: receiver._id,
+                message: msg.trim(),
+            })
+            await savedMessage.populate([
+                { path: "sender", select: "name email role" },
+                { path: "receiver", select: "name email role" },
+            ])
+
+            const messageData = savedMessage.toObject()
+            const receiverSockets = connectedUsers.get(String(receiver._id))
+            receiverSockets?.forEach((socketId) => {
+                io.to(socketId).emit("rec-msg", messageData)
+            })
+
+            acknowledge({ success: true, message: messageData })
+        } catch (error) {
+            acknowledge({ success: false, message: error.message || "Unable to send message" })
+        }
+    })
+
+    socket.on("disconnect", () => {
+        if (!userId) return
+
+        const userSockets = connectedUsers.get(userId)
+        userSockets?.delete(socket.id)
+        if (userSockets?.size === 0) connectedUsers.delete(userId)
+    })
 })
 
 app.use(cookieParse())
@@ -76,7 +153,7 @@ mongoose.connect(process.env.DB_TOKEN)
 
 app.use((err, req, res, next) => {
     // console.log(err)
-    res.status(err.status || 400)
+    res.status(err.statusCode || 500)
     .json({
        success : false, 
        message : err.message

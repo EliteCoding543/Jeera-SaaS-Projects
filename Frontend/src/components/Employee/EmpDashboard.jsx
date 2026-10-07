@@ -21,8 +21,8 @@ const EmpDashboard = () => {
 //   console.log(task);
 
   const dispatch = useDispatch();
-
   useEffect(() => {
+    if(user.role == !"admin, owner") return;
     const fetchData = async () => {
       try {
         const res = await getEmployeTask();

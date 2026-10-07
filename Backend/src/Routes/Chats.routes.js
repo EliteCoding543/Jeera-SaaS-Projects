@@ -1,6 +1,6 @@
 import express from 'express'
 import { authorize, isLoggedIn, isOrganizationActive } from '../Middlewere/index.js';
-import { getChat } from '../Controller/Chats.js';
+import { getChat, getConversation } from '../Controller/Chats.js';
 const ChatsRouter = express.Router()
 
 ChatsRouter.get("/",
@@ -8,6 +8,13 @@ ChatsRouter.get("/",
     isOrganizationActive,
     authorize("employee", "admin"),
     getChat
+)
+
+ChatsRouter.get("/:userId/messages",
+    isLoggedIn,
+    isOrganizationActive,
+    authorize("employee", "admin"),
+    getConversation
 )
 
 
