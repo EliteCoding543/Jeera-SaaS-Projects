@@ -52,7 +52,9 @@ export const LoginUser = async (req, res, next) => {
             .status(200)
             .cookie("token", token, {
                 maxAge: 24 * 60 * 60 * 1000,
-                httpOnly: true
+                httpOnly: true,
+                secure: true,
+                sameSite: "none"
             })
             .json(
                 new ResponseHandler(
@@ -72,7 +74,11 @@ export const LogoutUser = async (req, res, next) => {
     try {
         return res
             .status(200)
-            .clearCookie("token")
+            .clearCookie("token", {
+                httpOnly: true,
+                secure: true,
+                sameSite: "none"
+            })
             .json(
                 new ResponseHandler(
                     200,
