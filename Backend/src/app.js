@@ -120,7 +120,9 @@ app.use(cookieParse())
 app.use(express.json())
 app.use(cors({
     origin : process.env.FRONTEND_URL,
-    credentials : true
+    credentials : true,
+    methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }))
 
 // ================= ROUTES =================
