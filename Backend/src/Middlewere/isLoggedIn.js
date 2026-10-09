@@ -6,8 +6,7 @@ import validator from "validator";
 
 export const isLoggedIn = async (req, res, next) => {
     try {
-        console.log("Cookie header:", Boolean(req.headers.cookie));
-        console.log("Parsed cookie names:", Object.keys(req.cookies || {}));
+
 
         const token = req.cookies?.token;
 

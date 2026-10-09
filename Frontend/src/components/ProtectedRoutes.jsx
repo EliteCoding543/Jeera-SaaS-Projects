@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Outlet, useNavigate } from 'react-router-dom'
 import {addUserData} from '../utlis/Redux/userSlice'
 import Loading from '../components/Loading'
-import { api } from '../API\'s/api'
+import { api } from "../API's/api"
 
 const ProtectedRoutes = () => {
    const userData = useSelector(state => state.user)

@@ -122,7 +122,7 @@ app.use(cors({
     origin : allowedorigin,
     credentials : true,
     methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    headers : {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`}
 }))
 
 // ================= ROUTES =================
