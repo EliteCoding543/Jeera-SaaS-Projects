@@ -1,4 +1,3 @@
-
 import jwt from "jsonwebtoken";
 import ErrorHandler from "../Utlis/ErrorHandler.js";
 import User from "../Models/User.Schema.js";
