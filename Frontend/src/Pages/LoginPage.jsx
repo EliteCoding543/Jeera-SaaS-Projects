@@ -39,13 +39,23 @@ const handleSubmit = async (e) => {
 
   try {
     setLoading(true);
-    const res = await axios.post( `${api}/auth/login`,
+    const res = await axios.post(
+      `${api}/auth/login`,
       formData,
       {
         withCredentials: true,
       }
     );
-    toast.success("User logged in Successfull")
+
+    // 🔴 CRITICAL FIX: Backend se aaye token ko LocalStorage me save karein!
+    // Check karein aapka backend token kis name se bhej raha hai (e.g., res.data.token ya res.data.accessToken)
+    const token = res.data.token || res.data.accessToken || res.data.data?.token;
+
+    if (token) {
+      localStorage.setItem("token", token);
+    }
+
+    toast.success("User logged in successfully");
     nav("/dashboard");
   } catch (error) {
     console.log(error);
