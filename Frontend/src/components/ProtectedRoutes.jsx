@@ -11,14 +11,19 @@ const ProtectedRoutes = () => {
    const nav = useNavigate()
 
    useEffect(() => {
-          axios.get(import.meta.env.VITE_BACKEND_URL + "/auth/profile", {withCredentials : true})
+          axios.get(import.meta.env.VITE_BACKEND_URL + "/auth/profile", 
+            {withCredentials : true})
           .then((res) => {
             dispatch(addUserData(res.data.data))
             // console.log(addUserData(res.data.data))
           })
-          .catch(() => {
-            nav("/login")
-          })
+
+      .catch((error) => {
+          console.log("Profile status:", error.response?.status);
+          console.log("Profile error:", error.response?.data);
+          console.log("Profile URL:", error.config?.url);
+          nav("/login");
+      })
    }, [])
 
    if(!userData){
