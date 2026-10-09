@@ -1,4 +1,3 @@
-
 import jwt from "jsonwebtoken";
 import ErrorHandler from "../Utlis/ErrorHandler.js";
 import User from "../Models/User.Schema.js";
@@ -6,9 +5,10 @@ import validator from "validator";
 
 export const isLoggedIn = async (req, res, next) => {
     try {
-
-
-        const token = req.cookies?.token;
+        // 1. Authorization Header check karein, fir Cookie fallback
+        let token = req.headers.authorization?.startsWith("Bearer ")
+            ? req.headers.authorization.split(" ")[1]
+            : req.cookies?.token;
 
         if (!token) {
             return next(
