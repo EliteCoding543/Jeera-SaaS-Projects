@@ -109,17 +109,17 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         if (!userId) return
-
         const userSockets = connectedUsers.get(userId)
         userSockets?.delete(socket.id)
         if (userSockets?.size === 0) connectedUsers.delete(userId)
     })
 })
 
+const allowedorigin = "https://naxora-frontend.onrender.com"
 app.use(cookieParse())
 app.use(express.json())
 app.use(cors({
-    origin : process.env.FRONTEND_URL,
+    origin : allowedorigin,
     credentials : true,
     methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
