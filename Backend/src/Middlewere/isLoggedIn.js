@@ -1,38 +1,46 @@
-import jwt from 'jsonwebtoken'
+
+import jwt from "jsonwebtoken";
 import ErrorHandler from "../Utlis/ErrorHandler.js";
-import User from '../Models/User.Schema.js'
-import validator from 'validator'
+import User from "../Models/User.Schema.js";
+import validator from "validator";
 
-export const isLoggedIn = async(req, res, next) => {
+export const isLoggedIn = async (req, res, next) => {
     try {
-        const { token } = req.cookies
-        // Chcek token 
-        if(!token){
-            return next(new ErrorHandler(400, "Please before login.."))
+        console.log("Cookie header:", Boolean(req.headers.cookie));
+        console.log("Parsed cookie names:", Object.keys(req.cookies || {}));
+
+        const token = req.cookies?.token;
+
+        if (!token) {
+            return next(
+                new ErrorHandler(401, "Authentication token missing")
+            );
         }
 
-        if(!validator.isJWT(token)){
-            return next(new ErrorHandler(400, "Invalid Token Please login valid token"))
+        if (!validator.isJWT(token)) {
+            return next(
+                new ErrorHandler(401, "Invalid authentication token")
+            );
         }
 
-        // Verify token
-        const originalToken =  jwt.verify(token, process.env.JWT_TOKEN)
+        const originalToken = jwt.verify(
+            token,
+            process.env.JWT_TOKEN
+        );
 
-        // findUser now
-        const findUser = await User.findById(originalToken._id).populate("organizationId")
+        const findUser = await User.findById(originalToken._id)
+            .populate("organizationId");
 
-        // Chcek user 
-        if(!findUser){
-            return next(new ErrorHandler(400, "user not found "))
+        if (!findUser) {
+            return next(
+                new ErrorHandler(401, "User not found")
+            );
         }
 
-       // Attach user to request
         req.user = findUser;
 
-        // Move to next middleware/controller
-        next();
-
+        return next();
     } catch (error) {
-         next(error)
+        return next(error);
     }
-}
+};
