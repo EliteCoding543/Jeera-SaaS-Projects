@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link , useNavigate} from "react-router-dom";
 import  toast  from "react-hot-toast";
 import axios from 'axios'
+import { api } from "../API's/api"
 import {
   ArrowRight,
   Eye,
@@ -38,8 +39,7 @@ const handleSubmit = async (e) => {
 
   try {
     setLoading(true);
-    const res = await axios.post(
-      import.meta.env.VITE_BACKEND_URL + "/auth/login",
+    const res = await axios.post( `${api}/auth/login`,
       formData,
       {
         withCredentials: true,
