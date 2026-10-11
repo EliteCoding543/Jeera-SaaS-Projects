@@ -31,7 +31,6 @@ const Navbar = () => {
           withCredentials: true,
         }
       );
-
       toast.success("Logged out successfully");
       nav("/login");
     } catch (error) {
@@ -39,6 +38,7 @@ const Navbar = () => {
         error.response?.data?.message || "Logout failed"
       );
     } finally {
+      localStorage.removeItem("token");
       setLoading(false);
     }
   };
@@ -132,7 +132,6 @@ const Navbar = () => {
 
 
           {/* Profile Wrapper */}
-
 
           <div className="relative">
 

@@ -45,8 +45,10 @@ const handleSubmit = async (e) => {
         withCredentials: true,
       }
     );
+    localStorage.setItem("token", res.data.data.token);
     toast.success("User logged in Successfull")
     nav("/dashboard");
+
   } catch (error) {
     console.log(error);
     toast.error(

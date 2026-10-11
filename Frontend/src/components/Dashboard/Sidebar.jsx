@@ -13,9 +13,7 @@ const Sidebar = ({ links, setActivePage, activePage }) => {
 
       <div className="flex h-full flex-col px-4 py-5">
 
-        {/* ─────────────────────────────────────
-            WORKSPACE CARD
-        ───────────────────────────────────── */}
+        {/* WORKSPACE CARD */}
 
         <div className="relative mb-7 overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_4px_20px_rgba(15,23,42,0.04)]">
 
@@ -53,9 +51,7 @@ const Sidebar = ({ links, setActivePage, activePage }) => {
         </div>
 
 
-        {/* ─────────────────────────────────────
-            NAVIGATION
-        ───────────────────────────────────── */}
+        {/* NAVIGATION */}
 
         <div className="mb-3 flex items-center justify-between px-2">
 
@@ -161,9 +157,7 @@ const Sidebar = ({ links, setActivePage, activePage }) => {
         </nav>
 
 
-        {/* ─────────────────────────────────────
-            BOTTOM AREA
-        ───────────────────────────────────── */}
+        {/* BOTTOM AREA */}
 
         <div className="mt-auto">
 
@@ -216,13 +210,14 @@ const Sidebar = ({ links, setActivePage, activePage }) => {
                   }
                 )
                 .then(() => {
-
+                  localStorage.removeItem("token");
                   toast.success("User logged out");
 
                   window.location.href = "/login";
 
                 })
                 .catch((error) => {
+                  localStorage.removeItem("token");
 
                   toast.error(
                     error.response?.data?.message ||

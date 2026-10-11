@@ -61,7 +61,9 @@ export const LoginUser = async (req, res, next) => {
                 new ResponseHandler(
                     200,
                     "User logged in successfully",
-                    foundUser
+                {   foundUser,
+                    token
+                }
                 )
             );
 

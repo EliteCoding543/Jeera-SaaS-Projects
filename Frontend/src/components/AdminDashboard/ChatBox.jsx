@@ -31,9 +31,10 @@ const ChatBox = ({ user, onClose }) => {
   // Socket Connection
   useEffect(() => {
     const socket = io(import.meta.env.VITE_SOCKET_URL, {
-      withCredentials: true,
-    });
-
+       withCredentials: true,
+      auth: { token: localStorage.getItem("token") },
+     });
+     
     socketRef.current = socket;
 
     socket.on("connect", () => {

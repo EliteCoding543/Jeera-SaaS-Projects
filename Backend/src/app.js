@@ -23,6 +23,7 @@ import AnalyticsRouter from './Routes/analytics.routes.js'
 import ChatsRouter from './Routes/Chats.routes.js'
 
 const app = express()
+app.set("trust proxy", 1)
 const server = http.createServer(app)
 
 const allowedorigin = process.env.FRONTEND_URL || "https://naxora-frontend.onrender.com"
@@ -49,14 +50,14 @@ const io = new Server(server, {
 });
 
 // Socket auth middleware
-io.use(async (socket, next) => {
+io.use(async (socket, next) => { 
     try {
         const cookieHeader = socket.handshake.headers.cookie || ""
         const tokenCookie = cookieHeader
             .split(";")
             .map((cookie) => cookie.trim())
             .find((cookie) => cookie.startsWith("token="))
-        const token = tokenCookie && decodeURIComponent(tokenCookie.slice(6))
+            const token = socket.handshake.auth?.token || (tokenCookie && decodeURIComponent(tokenCookie.slice(6)))
 
         if (!token) return next(new Error("Authentication required"))
 
